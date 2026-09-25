@@ -1,0 +1,23 @@
+# Backend
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/.env
+backend/complyai.db
+backend/.pytest_cache/
+*.db
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+
+# General
+.DS_Store
+*.log
+.idea/
+.vscode/
