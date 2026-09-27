@@ -61,6 +61,12 @@ def parse_xlsx(file_path: str) -> List[dict]:
     return chunks
 
 
+def parse_txt(file_path: str) -> List[dict]:
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        text = f.read().strip()
+    return [{"content": text, "page_number": 1}] if text else []
+
+
 def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> List[str]:
     words = text.split()
     chunks = []
@@ -98,6 +104,7 @@ async def process_document_background(doc_id: str, file_path: str, file_type: st
                 "docx": parse_docx,
                 "csv": parse_csv,
                 "xlsx": parse_xlsx,
+                "txt": parse_txt,
             }
             parser = parsers.get(file_type)
             if not parser:

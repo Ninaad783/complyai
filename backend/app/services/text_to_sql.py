@@ -126,8 +126,23 @@ Provide a concise, professional summary answering the question based on this dat
         summary = model.generate_content(summary_prompt)
         answer_text = summary.text.strip() if summary and summary.text else f"Returned {len(data)} records."
 
+        # Format markdown table for clean UI rendering
+        table_md = ""
+        if data and len(data) > 0 and columns:
+            headers = " | ".join([c.replace("_", " ").title() for c in columns])
+            separators = " | ".join(["---"] * len(columns))
+            row_lines = []
+            for r in data[:8]:
+                vals = [str(r.get(c, "")).replace("|", "\\|") for c in columns]
+                row_lines.append(" | ".join(vals))
+            table_md = f"\n\n| {headers} |\n| {separators} |\n" + "\n".join([f"| {rl} |" for rl in row_lines])
+            if len(data) > 8:
+                table_md += f"\n\n*Showing top 8 of {len(data)} total records.*"
+
+        full_answer = f"{answer_text}{table_md}\n\n```sql\n{generated_sql}\n```"
+
         return {
-            "answer": answer_text,
+            "answer": full_answer,
             "sources": [{"type": "sql", "query": generated_sql, "rows_returned": len(data)}],
             "data": data,
             "sql": generated_sql,

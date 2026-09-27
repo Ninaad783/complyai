@@ -17,7 +17,7 @@ ALLOWED_TYPES = {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
     "text/csv": "csv",
-    "text/plain": "csv",  # some browsers send this for .csv
+    "text/plain": "txt",
 }
 
 
@@ -28,14 +28,12 @@ async def upload_document(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    # Detect type by content_type or extension fallback
-    file_type = ALLOWED_TYPES.get(file.content_type)
+    # Detect type by extension first, then content_type fallback
+    ext = (file.filename or "").rsplit(".", 1)[-1].lower()
+    ext_map = {"pdf": "pdf", "docx": "docx", "xlsx": "xlsx", "csv": "csv", "txt": "txt"}
+    file_type = ext_map.get(ext) or ALLOWED_TYPES.get(file.content_type)
     if not file_type:
-        ext = (file.filename or "").rsplit(".", 1)[-1].lower()
-        ext_map = {"pdf": "pdf", "docx": "docx", "xlsx": "xlsx", "csv": "csv"}
-        file_type = ext_map.get(ext)
-    if not file_type:
-        raise HTTPException(status_code=400, detail=f"Unsupported file type. Use PDF, DOCX, XLSX, or CSV.")
+        raise HTTPException(status_code=400, detail="Unsupported file type. Use PDF, DOCX, XLSX, CSV, or TXT.")
 
     content = await file.read()
     if len(content) > settings.MAX_FILE_SIZE_MB * 1024 * 1024:
