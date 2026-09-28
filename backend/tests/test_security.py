@@ -3,6 +3,7 @@ Unit tests for ComplyAI Security Guard (Prompt Injection & Sanitization)
 """
 import pytest
 from app.services.security_guard import check_prompt_injection, sanitize_input
+from app.services.pii_masker import detect_and_mask_pii
 
 
 def test_benign_queries_pass():
@@ -36,3 +37,20 @@ def test_sanitize_input():
     clean = sanitize_input(dirty)
     assert "\x00" not in clean
     assert clean == "Hello World!"
+
+
+def test_detect_and_mask_pii():
+    text = "User SSN is 000-12-3456, phone is +1-555-123-4567 and card is 4532-1234-5678-9010."
+    sanitized, detected = detect_and_mask_pii(text)
+    assert "SSN" in detected
+    assert "PHONE_NUMBER" in detected
+    assert "CREDIT_CARD" in detected
+    assert "000-12-3456" not in sanitized
+    assert "[REDACTED_SSN]" in sanitized
+    assert "[REDACTED_PHONE]" in sanitized
+    assert "[REDACTED_CARD_NUMBER]" in sanitized
+
+    clean_text = "What is the policy for annual data security audit?"
+    sanitized_clean, detected_clean = detect_and_mask_pii(clean_text)
+    assert detected_clean == []
+    assert sanitized_clean == clean_text

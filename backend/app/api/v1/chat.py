@@ -15,6 +15,7 @@ from app.services.text_to_sql import text_to_sql_answer
 from app.services.agent_orchestrator import run_agent_workflow
 from app.services.security_guard import check_prompt_injection, sanitize_input
 from app.services.evaluator import evaluate_rag_response
+from app.services.pii_masker import detect_and_mask_pii
 
 router = APIRouter()
 
@@ -84,6 +85,7 @@ async def ask(
     db: AsyncSession = Depends(get_db),
 ):
     clean_message = sanitize_input(data.message)
+    clean_message, pii_detected = detect_and_mask_pii(clean_message)
 
     # Security Guard: Prompt Injection Check
     is_malicious, security_reason = check_prompt_injection(clean_message)
@@ -135,6 +137,7 @@ async def ask(
                 "context_precision": 100,
                 "hallucination_risk": "None (Blocked)",
                 "eval_status": "Flagged Adversarial",
+                "pii_detected": pii_detected,
             },
         }
 
@@ -159,6 +162,7 @@ async def ask(
         result_data.get("sources", []),
         intent,
     )
+    metrics["pii_detected"] = pii_detected
 
     # Save assistant message
     assistant_msg = ChatMessage(

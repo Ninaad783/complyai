@@ -209,6 +209,12 @@ export const api = {
       demoDocs = [newDoc, ...demoDocs];
       return newDoc;
     },
+    seedSamplePack: async () => {
+      if (await checkBackend()) {
+        return request<any>("/api/v1/documents/seed-sample-pack", { method: "POST" });
+      }
+      return { message: "Sample pack loaded in demo mode", count: DEMO_DOCS.length };
+    },
   },
 
   chat: {

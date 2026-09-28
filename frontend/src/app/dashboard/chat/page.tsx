@@ -17,6 +17,7 @@ interface Message {
     context_precision?: number;
     hallucination_risk?: string;
     eval_status?: string;
+    pii_detected?: string[];
   };
   created_at?: string;
 }
@@ -88,6 +89,18 @@ function EvaluationBadge({ metrics }: { metrics?: any }) {
   );
 }
 
+function PiiBadge({ detected }: { detected?: string[] }) {
+  if (!detected || detected.length === 0) return null;
+  return (
+    <span
+      className="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full px-2.5 py-0.5 text-[11px] font-medium"
+      title={`Redacted sensitive identifiers: ${detected.join(", ")}`}
+    >
+      <span>🛡️ Redacted PII ({detected.join(", ")})</span>
+    </span>
+  );
+}
+
 function ChatBubble({ msg }: { msg: Message }) {
   const isUser = msg.role === "user";
   return (
@@ -136,6 +149,9 @@ function ChatBubble({ msg }: { msg: Message }) {
           ))}
           {!isUser && msg.metrics && (
             <EvaluationBadge metrics={msg.metrics} />
+          )}
+          {!isUser && msg.metrics?.pii_detected && msg.metrics.pii_detected.length > 0 && (
+            <PiiBadge detected={msg.metrics.pii_detected} />
           )}
         </div>
       </div>

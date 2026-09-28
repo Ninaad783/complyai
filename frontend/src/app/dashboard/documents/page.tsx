@@ -43,6 +43,8 @@ export default function DocumentsPage() {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState("");
+  const [seeding, setSeeding] = useState(false);
+  const [seedNotice, setSeedNotice] = useState("");
 
   const fetchDocs = () => {
     setLoading(true);
@@ -59,6 +61,20 @@ export default function DocumentsPage() {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleSeedPack = async () => {
+    setSeeding(true);
+    setSeedNotice("");
+    try {
+      const res = await api.documents.seedSamplePack();
+      setSeedNotice(res.message || "Sample pack loaded!");
+      fetchDocs();
+    } catch (err: any) {
+      setError(err.message || "Failed to load sample pack");
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const uploadFile = useCallback(async (file: File) => {
     setError("");
@@ -96,18 +112,32 @@ export default function DocumentsPage() {
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Document Knowledge Base</h1>
           <p className="text-gray-400 mt-1">Upload and manage compliance policies, contracts, and data files</p>
         </div>
-        <label className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium text-white cursor-pointer transition-colors shadow-lg shadow-indigo-600/20">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Upload Document
-          <input type="file" className="hidden" accept=".pdf,.docx,.xlsx,.csv,.txt" onChange={handleFileInput} />
-        </label>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSeedPack}
+            disabled={seeding}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 rounded-lg text-sm font-medium text-white transition-all shadow-lg shadow-emerald-600/20"
+          >
+            {seeding ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <span>⚡</span>
+            )}
+            <span>{seeding ? "Loading Pack..." : "Load Sample Pack"}</span>
+          </button>
+          <label className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium text-white cursor-pointer transition-colors shadow-lg shadow-indigo-600/20">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Upload Document
+            <input type="file" className="hidden" accept=".pdf,.docx,.xlsx,.csv,.txt" onChange={handleFileInput} />
+          </label>
+        </div>
       </div>
 
       {/* Drop zone */}
@@ -133,6 +163,16 @@ export default function DocumentsPage() {
         )}
       </div>
 
+      {seedNotice && (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg px-4 py-3 text-emerald-400 text-sm flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span>✅</span>
+            <span>{seedNotice}</span>
+          </div>
+          <button onClick={() => setSeedNotice("")} className="text-gray-400 hover:text-white text-xs">✕</button>
+        </div>
+      )}
+
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm flex items-center gap-2">
           <span>⚠️</span>
@@ -156,7 +196,14 @@ export default function DocumentsPage() {
           <div className="glass rounded-xl p-12 text-center">
             <div className="text-5xl mb-4">📂</div>
             <p className="text-gray-300 font-medium">No documents uploaded yet</p>
-            <p className="text-gray-500 text-xs mt-1">Upload your policies or SOPs to enable AI document search and compliance checking.</p>
+            <p className="text-gray-500 text-xs mt-1 mb-5">Upload your policies or SOPs to enable AI document search and compliance checking.</p>
+            <button
+              onClick={handleSeedPack}
+              disabled={seeding}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-semibold text-white transition-all shadow-md shadow-emerald-600/20"
+            >
+              <span>⚡ Load Enterprise Compliance Demo Pack</span>
+            </button>
           </div>
         ) : (
           <div className="space-y-2">
