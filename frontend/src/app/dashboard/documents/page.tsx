@@ -24,9 +24,9 @@ const typeColors: Record<string, string> = {
 };
 
 const statusConfig: Record<string, { label: string; color: string; dot: string }> = {
-  ready: { label: "Indexed & Ready", color: "text-green-400", dot: "bg-green-400" },
-  processing: { label: "Processing Embeddings...", color: "text-yellow-400", dot: "bg-yellow-400 animate-pulse" },
-  failed: { label: "Processing Error", color: "text-red-400", dot: "bg-red-400" },
+  ready: { label: "Indexed & Verified", color: "text-emerald-400", dot: "bg-emerald-400" },
+  processing: { label: "Vectorizing Content...", color: "text-amber-400", dot: "bg-amber-400 animate-pulse" },
+  failed: { label: "Indexing Failed", color: "text-rose-400", dot: "bg-rose-400" },
 };
 
 function formatSize(bytes: number) {
@@ -67,10 +67,10 @@ export default function DocumentsPage() {
     setSeedNotice("");
     try {
       const res = await api.documents.seedSamplePack();
-      setSeedNotice(res.message || "Sample pack loaded!");
+      setSeedNotice(res.message || "Standard compliance suite loaded successfully.");
       fetchDocs();
     } catch (err: any) {
-      setError(err.message || "Failed to load sample pack");
+      setError(err.message || "Failed to load compliance suite");
     } finally {
       setSeeding(false);
     }
@@ -104,7 +104,7 @@ export default function DocumentsPage() {
 
   const deleteDoc = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm("Delete this document from your knowledge base?")) return;
+    if (!confirm("Remove this document from active policy repository?")) return;
     await api.documents.delete(id);
     setDocuments((prev) => prev.filter((d) => d.id !== id));
     if (selectedDoc?.id === id) setSelectedDoc(null);
@@ -114,8 +114,8 @@ export default function DocumentsPage() {
     <div className="p-8 max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Document Knowledge Base</h1>
-          <p className="text-gray-400 mt-1">Upload and manage compliance policies, contracts, and data files</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Policy & Regulatory Repository</h1>
+          <p className="text-gray-400 text-sm mt-1">Manage governance frameworks, vendor agreements, and SOC-2 / ISO control documentation.</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -126,9 +126,11 @@ export default function DocumentsPage() {
             {seeding ? (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              <span>⚡</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
             )}
-            <span>{seeding ? "Loading Pack..." : "Load Sample Pack"}</span>
+            <span>{seeding ? "Importing Suite..." : "Import Compliance Suite"}</span>
           </button>
           <label className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium text-white cursor-pointer transition-colors shadow-lg shadow-indigo-600/20">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,21 +154,27 @@ export default function DocumentsPage() {
         {uploading ? (
           <div className="flex flex-col items-center gap-3">
             <div className="w-10 h-10 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-            <p className="text-gray-300 text-sm font-medium">Extracting text & generating Gemini vector embeddings...</p>
+            <p className="text-gray-300 text-sm font-medium">Extracting document structure and generating semantic vector embeddings...</p>
           </div>
         ) : (
-          <>
-            <div className="text-4xl mb-3">📤</div>
-            <p className="text-gray-200 font-medium">Drag & drop compliance documents here, or click upload</p>
-            <p className="text-gray-500 text-xs mt-1">Supports PDF, DOCX, XLSX, CSV · Up to 50MB</p>
-          </>
+          <div className="flex flex-col items-center">
+            <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-3">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <p className="text-gray-200 font-medium text-sm">Drop compliance policies or agreements here, or browse files</p>
+            <p className="text-gray-500 text-xs mt-1">Supports PDF, DOCX, XLSX, CSV, TXT · Maximum 50MB per file</p>
+          </div>
         )}
       </div>
 
       {seedNotice && (
         <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg px-4 py-3 text-emerald-400 text-sm flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span>✅</span>
+            <svg className="w-4 h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
             <span>{seedNotice}</span>
           </div>
           <button onClick={() => setSeedNotice("")} className="text-gray-400 hover:text-white text-xs">✕</button>
@@ -175,7 +183,9 @@ export default function DocumentsPage() {
 
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm flex items-center gap-2">
-          <span>⚠️</span>
+          <svg className="w-4 h-4 shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
           <span>{error}</span>
         </div>
       )}
@@ -183,7 +193,7 @@ export default function DocumentsPage() {
       {/* Document List */}
       <div>
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-          Indexed Documents ({documents.length})
+          Repository Assets ({documents.length})
         </h2>
 
         {loading ? (
@@ -194,15 +204,22 @@ export default function DocumentsPage() {
           </div>
         ) : documents.length === 0 ? (
           <div className="glass rounded-xl p-12 text-center">
-            <div className="text-5xl mb-4">📂</div>
-            <p className="text-gray-300 font-medium">No documents uploaded yet</p>
-            <p className="text-gray-500 text-xs mt-1 mb-5">Upload your policies or SOPs to enable AI document search and compliance checking.</p>
+            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 mx-auto mb-4">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <p className="text-gray-300 font-medium">No governance documents in repository</p>
+            <p className="text-gray-500 text-xs mt-1 mb-5">Import standard regulatory suites or upload custom company policies to enable semantic retrieval and compliance audits.</p>
             <button
               onClick={handleSeedPack}
               disabled={seeding}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-semibold text-white transition-all shadow-md shadow-emerald-600/20"
             >
-              <span>⚡ Load Enterprise Compliance Demo Pack</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span>Import Enterprise Compliance Suite (SOC-2, DPA, Ethics, HIPAA)</span>
             </button>
           </div>
         ) : (
@@ -288,7 +305,7 @@ export default function DocumentsPage() {
             </div>
             <div>
               <span className="text-gray-500 block">Status</span>
-              <span className="text-green-400 font-medium">Ready for RAG</span>
+              <span className="text-emerald-400 font-medium">Semantic Index Active</span>
             </div>
           </div>
 
@@ -297,13 +314,16 @@ export default function DocumentsPage() {
               onClick={() => router.push("/dashboard/chat")}
               className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              <span>💬</span> Ask AI about this document
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+              Query Document in Policy Assistant
             </button>
             <button
               onClick={() => router.push("/dashboard/reports")}
               className="bg-white/5 hover:bg-white/10 text-gray-200 text-xs font-medium py-2.5 px-4 rounded-lg transition-colors"
             >
-              Generate Compliance Report
+              Generate Audit Report
             </button>
           </div>
         </div>
