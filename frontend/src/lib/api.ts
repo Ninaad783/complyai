@@ -132,9 +132,12 @@ function demoAskAI(message: string, sessionId?: string): any {
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 let _backendOnline: boolean | null = null;
+let _lastCheck = 0;
 async function checkBackend(): Promise<boolean> {
-  if (_backendOnline === null) {
+  const now = Date.now();
+  if (_backendOnline === null || now - _lastCheck > 5000) {
     _backendOnline = await isBackendOnline();
+    _lastCheck = now;
   }
   return _backendOnline;
 }
@@ -192,7 +195,10 @@ export const api = {
           headers: getAuthHeader(),
           body: form,
         });
-        if (!res.ok) throw new Error("Upload failed");
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `Upload failed (${res.status})`);
+        }
         return res.json();
       }
       const ext = file.name.split(".").pop()?.toLowerCase() || "pdf";
