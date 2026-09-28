@@ -8,60 +8,60 @@ import { api } from "@/lib/api";
 const AGENT_STEPS = [
   {
     id: "retriever",
-    label: "Retrieval Agent",
+    label: "Search Policies",
     icon: (
       <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    desc: "Performs semantic vector search across policy repository",
+    desc: "Searches uploaded policies & manuals",
   },
   {
     id: "sql",
-    label: "SQL Interrogator",
+    label: "Check Database",
     icon: (
       <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3" />
       </svg>
     ),
-    desc: "Interrogates relational schemas and corporate datasets",
+    desc: "Checks employee & company records",
   },
   {
     id: "compliance",
-    label: "Control Verifier",
+    label: "Verify Rules",
     icon: (
       <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
       </svg>
     ),
-    desc: "Identifies regulatory discrepancies and control gaps",
+    desc: "Finds rule violations & gaps",
   },
   {
     id: "risk",
-    label: "Risk Evaluator",
+    label: "Assess Risk",
     icon: (
       <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
     ),
-    desc: "Quantifies audit exposure and severity impact",
+    desc: "Calculates overall risk score",
   },
   {
     id: "report",
-    label: "Audit Synthesizer",
+    label: "Final Report",
     icon: (
       <svg className="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    desc: "Compiles formal executive audit findings and remediation",
+    desc: "Creates clear summary & actions",
   },
 ];
 
 const EXAMPLE_QUERIES = [
-  "Cross-reference SOC-2 password policy with employee records to identify active non-compliance",
-  "Audit vendor contracts expiring within 90 days against subprocessor notification requirements",
-  "Evaluate departmental training completion rates and determine high-risk exposure areas",
+  "Check SOC-2 password policy requirements against our employee database records",
+  "Review vendor contracts expiring in 90 days and verify required notification windows",
+  "Audit employee compliance training records to identify who has not completed security training",
 ];
 
 interface AgentStep {
@@ -83,13 +83,13 @@ export default function AgentsPage() {
     setResult(null);
     setError("");
 
-    // Step-by-step progress
+    // Step-by-step progress with clean, simple descriptions
     const stepLabels = [
-      "Retrieving regulatory context from vector knowledge base",
-      "Interrogating relational schema across internal datasets",
-      "Evaluating compliance controls & identifying gap violations",
-      "Calculating composite multi-vector risk exposure",
-      "Synthesizing executive compliance audit report"
+      "Searching uploaded policies and documentation...",
+      "Checking employee and company database records...",
+      "Verifying compliance rules and finding gaps...",
+      "Calculating risk score and severity...",
+      "Generating final audit summary report..."
     ];
     const stepArr: AgentStep[] = stepLabels.map((label) => ({ label, done: false, active: false }));
     setSteps([...stepArr]);
@@ -106,7 +106,7 @@ export default function AgentsPage() {
       setSteps([...stepArr]);
       setResult(res);
     } catch (err: any) {
-      setError(err.message || "Agent workflow execution failed");
+      setError(err.message || "Audit execution failed");
     } finally {
       setRunning(false);
     }
@@ -115,13 +115,13 @@ export default function AgentsPage() {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Autonomous Compliance Orchestrator</h1>
-        <p className="text-gray-400 text-sm mt-1">Coordinated 5-stage agent pipeline executing continuous control verification and audit synthesis.</p>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Automated Compliance Audit</h1>
+        <p className="text-gray-400 text-sm mt-1">A 5-step automated check across your company policies and database records.</p>
       </div>
 
-      {/* Agent Pipeline Visualization */}
+      {/* Audit Steps Visualization */}
       <div className="glass rounded-xl p-6 mb-6">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Orchestration Pipeline</h3>
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Audit Steps</h3>
         <div className="flex items-start gap-0">
           {AGENT_STEPS.map((agent, i) => (
             <div key={agent.id} className="flex items-start flex-1">
@@ -139,7 +139,7 @@ export default function AgentsPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-xs font-medium text-white">{agent.label}</div>
-                  <div className="text-[10px] text-gray-500 mt-0.5 max-w-[80px] leading-tight">{agent.desc}</div>
+                  <div className="text-[10px] text-gray-500 mt-0.5 max-w-[85px] leading-tight">{agent.desc}</div>
                 </div>
               </div>
               {i < AGENT_STEPS.length - 1 && (
@@ -156,13 +156,13 @@ export default function AgentsPage() {
 
       {/* Query Input */}
       <div className="glass rounded-xl p-6 mb-6">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Audit Objective & Scope</h3>
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Audit Question & Scope</h3>
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           rows={3}
           className="w-full bg-[#0a0a0f] border border-[#1e1e2e] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500 resize-none mb-3"
-          placeholder="Specify compliance audit requirements requiring document analysis and relational data cross-referencing..."
+          placeholder="e.g., Check password policy requirements against our employee database records to find non-compliant accounts..."
         />
         <div className="flex flex-wrap gap-2 mb-4">
           {EXAMPLE_QUERIES.map((q) => (
@@ -171,7 +171,7 @@ export default function AgentsPage() {
               onClick={() => setQuery(q)}
               className="text-xs bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-300 rounded-lg px-3 py-1.5 transition-colors text-left"
             >
-              {q.slice(0, 60)}...
+              {q.slice(0, 65)}...
             </button>
           ))}
         </div>
@@ -183,7 +183,7 @@ export default function AgentsPage() {
           {running ? (
             <span className="flex items-center justify-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Executing Autonomous Pipeline...
+              Running Automated Audit...
             </span>
           ) : (
             <>
@@ -191,7 +191,7 @@ export default function AgentsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Execute Autonomous Audit Workflow</span>
+              <span>Run Automated Audit</span>
             </>
           )}
         </button>
@@ -200,7 +200,7 @@ export default function AgentsPage() {
       {/* Live Steps */}
       {steps.length > 0 && (
         <div className="glass rounded-xl p-6 mb-6 animate-fade-in">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Pipeline Execution Telemetry</h3>
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Audit Progress</h3>
           <div className="space-y-2.5">
             {steps.map((step, i) => (
               <div key={i} className={`flex items-center gap-3 text-sm transition-all ${step.active ? "opacity-100" : step.done ? "opacity-100" : "opacity-30"}`}>
@@ -219,7 +219,7 @@ export default function AgentsPage() {
                   {step.label}
                 </span>
                 {step.active && <span className="text-xs text-indigo-400 animate-pulse">Running...</span>}
-                {step.done && <span className="text-xs text-emerald-400">Verified</span>}
+                {step.done && <span className="text-xs text-emerald-400">Completed</span>}
               </div>
             ))}
           </div>
@@ -233,7 +233,7 @@ export default function AgentsPage() {
             <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 className="font-semibold text-white">Audit Findings & Executive Dossier</h3>
+            <h3 className="font-semibold text-white">Audit Report & Recommendations</h3>
           </div>
           <div className="prose prose-invert max-w-none text-sm leading-relaxed text-gray-300 max-h-[500px] overflow-y-auto space-y-2">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -244,8 +244,8 @@ export default function AgentsPage() {
       )}
 
       {error && (
-        <div className="glass rounded-xl p-4 animate-fade-in bg-red-500/5 border-red-500/30">
-          <p className="text-red-400 text-sm">{error}</p>
+        <div className="glass rounded-xl p-4 animate-fade-in bg-rose-500/10 border border-rose-500/30">
+          <p className="text-rose-400 text-sm">{error}</p>
         </div>
       )}
     </div>

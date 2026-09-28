@@ -31,10 +31,10 @@ interface Session {
 function IntentBadge({ intent }: { intent?: string }) {
   if (!intent) return null;
   const labels: Record<string, { label: string; icon: string }> = {
-    rag: { label: "Policy Knowledge Retrieval", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-    sql: { label: "Structured SQL Interrogation", icon: "M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3" },
-    agent: { label: "Multi-Agent Audit Pipeline", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
-    security_blocked: { label: "Security Guardrail Intercept", icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" },
+    rag: { label: "Policy Search", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
+    sql: { label: "Database Query", icon: "M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3" },
+    agent: { label: "Full Audit", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
+    security_blocked: { label: "Blocked by Security", icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" },
   };
   const item = labels[intent] || { label: intent, icon: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" };
   return (
@@ -70,17 +70,17 @@ function EvaluationBadge({ metrics }: { metrics?: any }) {
         <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>Grounded: {metrics.faithfulness ?? 95}%</span>
+        <span>Verified Accuracy: {metrics.faithfulness ?? 95}%</span>
         <span className="text-[8px] opacity-75">▼</span>
       </button>
       {open && (
         <div className="absolute left-0 top-6 z-20 w-64 bg-[#14141e] border border-[#262638] rounded-xl p-3 shadow-2xl text-xs space-y-1.5 animate-fade-in">
           <div className="font-semibold text-white border-b border-white/10 pb-1 flex justify-between">
-            <span>RAG Grounding Audit</span>
+            <span>Accuracy &amp; Source Check</span>
             <span className="text-emerald-400">{metrics.eval_status || "Verified"}</span>
           </div>
           <div className="flex justify-between text-gray-400">
-            <span>Faithfulness:</span>
+            <span>Document Match:</span>
             <span className="font-semibold text-emerald-400">{metrics.faithfulness ?? 95}%</span>
           </div>
           <div className="flex justify-between text-gray-400">
@@ -92,7 +92,7 @@ function EvaluationBadge({ metrics }: { metrics?: any }) {
             <span className="font-semibold text-cyan-300">{metrics.context_precision ?? 90}%</span>
           </div>
           <div className="flex justify-between text-gray-400 border-t border-white/5 pt-1">
-            <span>Hallucination Risk:</span>
+            <span>Risk of Inaccuracy:</span>
             <span className="font-semibold text-emerald-400">{metrics.hallucination_risk ?? "Low"}</span>
           </div>
         </div>
@@ -148,17 +148,35 @@ function ChatBubble({ msg }: { msg: Message }) {
                 remarkPlugins={[remarkGfm]}
                 components={{
                   h1: ({ node, ...props }) => <h1 className="text-base font-bold text-white mt-2 mb-1" {...props} />,
-                  h2: ({ node, ...props }) => <h2 className="text-sm font-bold text-indigo-300 mt-2 mb-1" {...props} />,
-                  h3: ({ node, ...props }) => <h3 className="text-sm font-semibold text-gray-200 mt-1 mb-0.5" {...props} />,
-                  p: ({ node, ...props }) => <p className="mb-2 leading-relaxed" {...props} />,
-                  ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-2 space-y-1 text-gray-300" {...props} />,
-                  ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-2 space-y-1 text-gray-300" {...props} />,
+                  h2: ({ node, ...props }) => <h2 className="text-sm font-semibold text-white mt-2 mb-1" {...props} />,
+                  h3: ({ node, ...props }) => <h3 className="text-xs font-semibold text-indigo-300 mt-1 mb-0.5 uppercase tracking-wider" {...props} />,
+                  p: ({ node, ...props }) => <p className="mb-2 last:mb-0 leading-relaxed text-gray-300" {...props} />,
+                  ul: ({ node, ...props }) => <ul className="list-disc list-inside space-y-1 mb-2 text-gray-300" {...props} />,
+                  ol: ({ node, ...props }) => <ol className="list-decimal list-inside space-y-1 mb-2 text-gray-300" {...props} />,
                   li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
                   strong: ({ node, ...props }) => <strong className="font-semibold text-white" {...props} />,
-                  code: ({ node, ...props }) => <code className="bg-black/30 border border-white/10 px-1.5 py-0.5 rounded text-xs text-cyan-300 font-mono" {...props} />,
-                  table: ({ node, ...props }) => <div className="overflow-x-auto my-3"><table className="w-full border-collapse border border-[#1e1e2e] text-xs" {...props} /></div>,
-                  th: ({ node, ...props }) => <th className="border border-[#1e1e2e] bg-[#161622] px-3 py-1.5 text-left font-semibold text-white" {...props} />,
-                  td: ({ node, ...props }) => <td className="border border-[#1e1e2e] px-3 py-1.5 text-gray-300" {...props} />,
+                  code: ({ node, className, children, ...props }) => {
+                    const isInline = !className;
+                    return isInline ? (
+                      <code className="bg-[#1e1e2e] text-indigo-300 px-1.5 py-0.5 rounded text-xs font-mono" {...props}>
+                        {children}
+                      </code>
+                    ) : (
+                      <code className="block bg-[#0d0d15] border border-[#1e1e2e] rounded-lg p-3 text-xs font-mono text-cyan-300 overflow-x-auto my-2" {...props}>
+                        {children}
+                      </code>
+                    );
+                  },
+                  blockquote: ({ node, ...props }) => (
+                    <blockquote className="border-l-2 border-indigo-500/50 pl-3 my-2 text-gray-400 italic text-xs" {...props} />
+                  ),
+                  table: ({ node, ...props }) => (
+                    <div className="overflow-x-auto my-3 border border-[#1e1e2e] rounded-lg">
+                      <table className="min-w-full text-xs text-left" {...props} />
+                    </div>
+                  ),
+                  th: ({ node, ...props }) => <th className="bg-[#161622] px-3 py-2 text-gray-300 font-semibold border-b border-[#1e1e2e]" {...props} />,
+                  td: ({ node, ...props }) => <td className="px-3 py-2 border-b border-[#1e1e2e]/50 text-gray-400" {...props} />,
                 }}
               >
                 {msg.content}
@@ -166,15 +184,14 @@ function ChatBubble({ msg }: { msg: Message }) {
             </div>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-          {msg.sources && msg.sources.length > 0 && msg.sources.slice(0, 4).map((s, i) => (
-            <SourceChip key={i} source={s} />
-          ))}
-          {!isUser && msg.metrics && (
-            <EvaluationBadge metrics={msg.metrics} />
-          )}
-          {!isUser && msg.metrics?.pii_detected && msg.metrics.pii_detected.length > 0 && (
-            <PiiBadge detected={msg.metrics.pii_detected} />
+        <div className="flex items-center gap-2 flex-wrap">
+          {!isUser && <EvaluationBadge metrics={msg.metrics} />}
+          {!isUser && <PiiBadge detected={msg.metrics?.pii_detected} />}
+          {msg.sources && msg.sources.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+              <span className="text-[10px] text-gray-500 font-medium">Sources:</span>
+              {msg.sources.map((s, i) => <SourceChip key={i} source={s} />)}
+            </div>
           )}
         </div>
       </div>
@@ -192,54 +209,77 @@ export default function ChatPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api.chat.sessions().then(setSessions).catch(() => {});
+    loadSessions();
   }, []);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const loadSessions = async () => {
+    try {
+      const data = await api.chat.sessions();
+      setSessions(data);
+      if (data.length > 0 && !activeSession) {
+        loadSession(data[0].id);
+      }
+    } catch {
+      // Offline fallback
+    }
+  };
 
   const loadSession = async (id: string) => {
     setActiveSession(id);
     setLoadingMessages(true);
     try {
-      const msgs = await api.chat.messages(id);
-      setMessages(msgs);
+      const data = await api.chat.messages(id);
+      setMessages(data);
+    } catch {
+      setMessages([]);
     } finally {
       setLoadingMessages(false);
     }
   };
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
-    const text = input;
+    const text = input.trim();
     setInput("");
-    setLoading(true);
 
-    const userMsg: Message = { id: Date.now().toString(), role: "user", content: text };
-    setMessages((prev) => [...prev, userMsg]);
+    const tempUserMsg: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: text,
+    };
+    setMessages((prev) => [...prev, tempUserMsg]);
+    setLoading(true);
 
     try {
       const res = await api.chat.ask(text, activeSession || undefined);
-      if (!activeSession) {
+
+      if (!activeSession && res.session_id) {
         setActiveSession(res.session_id);
-        setSessions((prev) => [{ id: res.session_id, title: text.slice(0, 50), updated_at: new Date().toISOString() }, ...prev]);
+        loadSessions();
       }
-      const aiMsg: Message = {
-        id: res.message_id,
+
+      const assistantMsg: Message = {
+        id: (Date.now() + 1).toString(),
         role: "assistant",
         content: res.answer,
         sources: res.sources,
         intent: res.intent,
         metrics: res.metrics,
       };
-      setMessages((prev) => [...prev, aiMsg]);
+      setMessages((prev) => [...prev, assistantMsg]);
     } catch (err: any) {
-      setMessages((prev) => [...prev, {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: `Error: ${err.message}`,
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: `Error: ${err.message || "Failed to process request"}`,
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -254,7 +294,7 @@ export default function ChatPage() {
     "What are our password length and MFA hardware key requirements under SOC-2?",
     "Which employees are overdue for mandatory compliance training?",
     "Summarize subprocessor notification and objection windows in our Vendor DPA",
-    "Execute an autonomous multi-agent audit across policies and employee records",
+    "Run an automated compliance check across policies and employee records",
   ];
 
   return (
@@ -295,12 +335,12 @@ export default function ChatPage() {
         <div className="px-6 py-4 border-b border-[#1e1e2e] flex items-center justify-between">
           <div>
             <h1 className="font-semibold text-white tracking-tight">Compliance Intelligence Assistant</h1>
-            <p className="text-xs text-gray-500">Semantic Policy Retrieval · Relational SQL Engine · Multi-Agent Audit Pipeline</p>
+            <p className="text-xs text-gray-500">Search policies · Check database records · Run automated audits</p>
           </div>
           <div className="flex gap-2 text-xs">
-            <span className="badge-rag px-2.5 py-1 rounded-full text-[11px] font-medium">Document RAG</span>
-            <span className="badge-sql px-2.5 py-1 rounded-full text-[11px] font-medium">Text-to-SQL</span>
-            <span className="badge-agent px-2.5 py-1 rounded-full text-[11px] font-medium">Agent Pipeline</span>
+            <span className="badge-rag px-2.5 py-1 rounded-full text-[11px] font-medium">Search Policies</span>
+            <span className="badge-sql px-2.5 py-1 rounded-full text-[11px] font-medium">Check Database</span>
+            <span className="badge-agent px-2.5 py-1 rounded-full text-[11px] font-medium">Full Audit</span>
           </div>
         </div>
 
@@ -313,9 +353,9 @@ export default function ChatPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h2 className="text-lg font-semibold text-white mb-2">Query Governance Policies & Compliance Records</h2>
+              <h2 className="text-lg font-semibold text-white mb-2">Ask About Policies &amp; Compliance Records</h2>
               <p className="text-gray-400 text-sm mb-8 leading-relaxed">
-                Interrogate indexed regulatory standards, cross-reference employee training databases, or trigger autonomous audit assessments.
+                Search through uploaded regulatory standards, verify employee records in the database, or run complete automated audits.
               </p>
               <div className="grid grid-cols-2 gap-3 text-left">
                 {suggestedPrompts.map((p) => (
@@ -349,7 +389,11 @@ export default function ChatPage() {
 
           {loading && (
             <div className="flex gap-3 animate-fade-in">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center shrink-0 text-sm font-bold text-white">AI</div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shrink-0 text-white shadow-lg shadow-indigo-500/20">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
               <div className="bg-[#111118] border border-[#1e1e2e] rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
                 <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                 <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -368,7 +412,7 @@ export default function ChatPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                placeholder="Ask about your documents, policies, or data..."
+                placeholder="Ask any question about your documents, policies, or database records..."
                 rows={1}
                 className="w-full bg-transparent px-4 pt-3 pb-2 text-sm text-white placeholder-gray-600 resize-none focus:outline-none"
                 style={{ minHeight: "44px", maxHeight: "120px" }}
