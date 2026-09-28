@@ -31,10 +31,11 @@ jobs:
       - name: Run Pytest Test Suite
         working-directory: ./backend
         env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY || 'test-mock-key' }}
+          PYTHONPATH: .
           SECRET_KEY: test-secret-key-for-ci
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
-          pytest tests/ -v
+          python -m pytest tests/ -v
 
   frontend-build:
     name: Frontend Build & Typecheck

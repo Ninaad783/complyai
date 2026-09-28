@@ -6,10 +6,14 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 
-client = TestClient(app)
+
+@pytest.fixture(scope="module")
+def client():
+    with TestClient(app) as c:
+        yield c
 
 
-def test_health_endpoint():
+def test_health_endpoint(client):
     response = client.get("/api/health")
     assert response.status_code == 200
     data = response.json()
@@ -17,7 +21,7 @@ def test_health_endpoint():
     assert data["app"] == "ComplyAI"
 
 
-def test_user_registration_and_login():
+def test_user_registration_and_login(client):
     unique_email = f"test_{uuid.uuid4().hex[:8]}@example.com"
     reg_payload = {
         "email": unique_email,
@@ -49,7 +53,7 @@ def test_user_registration_and_login():
     assert me_data["role"] == "analyst"
 
 
-def test_invalid_login():
+def test_invalid_login(client):
     login_res = client.post(
         "/api/v1/auth/login",
         data={"username": "nonexistent@test.com", "password": "wrongpassword"}
