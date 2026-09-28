@@ -97,8 +97,9 @@ async def list_documents(
 
 SAMPLE_PACK_DOCS = [
     {
-        "name": "SOC2_and_ISO27001_Information_Security_Policy",
-        "filename": "SOC2_and_ISO27001_Information_Security_Policy.txt",
+        "name": "SOC2_Type_II_Information_Security_Policy",
+        "filename": "SOC2_Type_II_Information_Security_Policy.txt",
+        "pdf_filename": "SOC2_Type_II_Information_Security_Policy.pdf",
         "content": (
             "# ComplyAI Enterprise Information Security & Access Policy (SOC-2 Type II & ISO-27001)\n\n"
             "## 1. Scope & Objective\n"
@@ -121,8 +122,9 @@ SAMPLE_PACK_DOCS = [
         ),
     },
     {
-        "name": "Vendor_Risk_Management_and_GDPR_DPA",
-        "filename": "Vendor_Risk_Management_and_GDPR_DPA.txt",
+        "name": "Vendor_Data_Processing_Agreement_DPA",
+        "filename": "Vendor_Data_Processing_Agreement_DPA.txt",
+        "pdf_filename": "Vendor_Data_Processing_Agreement_DPA.pdf",
         "content": (
             "# ComplyAI Vendor Risk Management Framework & Data Processing Agreement (DPA)\n\n"
             "## 1. Purpose & Regulatory Alignment\n"
@@ -140,12 +142,13 @@ SAMPLE_PACK_DOCS = [
             "- Vendor must provide an incident post-mortem and forensic analysis within 72 hours.\n\n"
             "## 5. Limitation of Liability\n"
             "- Aggregate liability for standard commercial breaches is capped at 1x annual contract value.\n"
-            "- Liability for data protection breaches or gross negligence is explicitly capped at 3x annual contract value or $2,000,000, whichever is greater.\n"
+            "- Liability for data protection breaches or gross negligence is explicitly capped at 3x annual contract value or $5,000,000, whichever is greater.\n"
         ),
     },
     {
-        "name": "Corporate_Code_of_Ethics_and_Whistleblower_Policy",
-        "filename": "Corporate_Code_of_Ethics_and_Whistleblower_Policy.txt",
+        "name": "Corporate_Code_of_Ethics_and_Conduct",
+        "filename": "Corporate_Code_of_Ethics_and_Conduct.txt",
+        "pdf_filename": "Corporate_Code_of_Ethics_and_Conduct.pdf",
         "content": (
             "# ComplyAI Corporate Code of Ethics, Anti-Bribery & Whistleblower Charter\n\n"
             "## 1. Ethical Governance Standard\n"
@@ -162,6 +165,26 @@ SAMPLE_PACK_DOCS = [
             "- Anonymity & Non-Retaliation: Reports may be submitted completely anonymously. ComplyAI enforces zero tolerance for retaliation against whistleblowers reporting in good faith.\n"
         ),
     },
+    {
+        "name": "HIPAA_and_Healthcare_Data_Safeguards",
+        "filename": "HIPAA_and_Healthcare_Data_Safeguards.txt",
+        "pdf_filename": "HIPAA_and_Healthcare_Data_Safeguards.pdf",
+        "content": (
+            "# ComplyAI Healthcare Data Privacy & HIPAA Security Standards\n\n"
+            "## 1. Scope & Minimum Necessary Standard\n"
+            "Workforce members may only access or request the minimum necessary electronic Protected Health Information (ePHI) required for authorized compliance reviews.\n\n"
+            "## 2. Business Associate Agreements (BAAs)\n"
+            "ComplyAI must execute a formal, legally binding BAA with all cloud providers, IT sub-vendors, or partners prior to transmitting or ingesting ePHI.\n\n"
+            "## 3. Technical Safeguards\n"
+            "- AES-256 encryption at rest with HSM master keys rotated every 180 days.\n"
+            "- Mandatory TLS 1.3 transmission security.\n"
+            "- Automatic screen inactivity logoff after 10 minutes.\n"
+            "- Audit logs retained for 6 years pursuant to 45 CFR 164.316(b).\n\n"
+            "## 4. Breach Notification SLAs\n"
+            "- Individual written notice required within 60 days of breach discovery.\n"
+            "- HHS OCR and media notice required for breaches affecting 500+ individuals.\n"
+        ),
+    },
 ]
 
 
@@ -172,6 +195,9 @@ async def seed_sample_pack(
     db: AsyncSession = Depends(get_db),
 ):
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+    sample_pdf_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "sample_compliance_pdfs")
+    )
 
     result = await db.execute(
         select(Document.name).where(Document.owner_id == current_user.id)
@@ -184,15 +210,31 @@ async def seed_sample_pack(
             continue
 
         file_id = str(uuid.uuid4())
-        file_path = os.path.join(settings.UPLOAD_DIR, f"{file_id}_{item['filename']}")
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(item["content"])
+        pdf_name = item.get("pdf_filename")
+        pdf_path = os.path.join(sample_pdf_dir, pdf_name) if pdf_name else None
+
+        if pdf_path and os.path.exists(pdf_path):
+            with open(pdf_path, "rb") as f_src:
+                pdf_bytes = f_src.read()
+            file_path = os.path.join(settings.UPLOAD_DIR, f"{file_id}_{pdf_name}")
+            with open(file_path, "wb") as f_dst:
+                f_dst.write(pdf_bytes)
+            file_type = "pdf"
+            orig_name = pdf_name
+            file_size = len(pdf_bytes)
+        else:
+            file_path = os.path.join(settings.UPLOAD_DIR, f"{file_id}_{item['filename']}")
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(item["content"])
+            file_type = "txt"
+            orig_name = item["filename"]
+            file_size = len(item["content"].encode("utf-8"))
 
         doc = Document(
             name=item["name"],
-            original_filename=item["filename"],
-            file_type="txt",
-            file_size=len(item["content"].encode("utf-8")),
+            original_filename=orig_name,
+            file_type=file_type,
+            file_size=file_size,
             file_path=file_path,
             status="processing",
             owner_id=current_user.id,
@@ -200,8 +242,8 @@ async def seed_sample_pack(
         db.add(doc)
         await db.flush()
 
-        background_tasks.add_task(process_document_background, doc.id, file_path, "txt")
-        seeded_docs.append({"id": doc.id, "name": doc.name})
+        background_tasks.add_task(process_document_background, doc.id, file_path, file_type)
+        seeded_docs.append({"id": doc.id, "name": doc.name, "file_type": file_type})
 
     await db.commit()
 
@@ -213,7 +255,7 @@ async def seed_sample_pack(
         }
 
     return {
-        "message": f"Successfully loaded {len(seeded_docs)} enterprise compliance documents. Embedding in background.",
+        "message": f"Successfully loaded {len(seeded_docs)} enterprise compliance documents (including multi-page PDFs). Embedding in background.",
         "count": len(seeded_docs),
         "documents": seeded_docs,
     }
