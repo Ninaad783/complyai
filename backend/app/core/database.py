@@ -1,13 +1,15 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 
-# SQLite - works with zero installation
-DATABASE_URL = "sqlite+aiosqlite:///./complyai.db"
+from app.core.config import settings
+
+DATABASE_URL = settings.DATABASE_URL
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
 engine = create_async_engine(
     DATABASE_URL,
     echo=False,
-    connect_args={"check_same_thread": False},
+    connect_args=connect_args,
 )
 
 AsyncSessionLocal = async_sessionmaker(

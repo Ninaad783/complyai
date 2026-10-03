@@ -32,9 +32,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Parse allowed origins for both local dev and production deployments
+allowed_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+if settings.FRONTEND_URL:
+    for url in settings.FRONTEND_URL.split(","):
+        cleaned = url.strip().rstrip("/")
+        if cleaned and cleaned not in allowed_origins:
+            allowed_origins.append(cleaned)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", settings.FRONTEND_URL],
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Automatically allows all Vercel production and preview URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

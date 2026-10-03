@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-2.5-flash"
     EMBEDDING_MODEL: str = "models/gemini-embedding-001"
 
+    # Database
+    DATABASE_URL: str = "sqlite+aiosqlite:///./complyai.db"
+
     # CORS
     FRONTEND_URL: str = "http://localhost:3000"
 
