@@ -52,21 +52,49 @@ async def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
     db: AsyncSession = Depends(get_db),
 ) -> User:
-    # 1. Try decoding standard JWT if credentials are provided
-    if credentials and credentials.credentials:
-        token = credentials.credentials
-        # If token is not a demo token, try decoding JWT
-        if not token.startswith("demo_"):
-            try:
-                payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-                user_id: str = payload.get("sub")
-                if user_id:
-                    result = await db.execute(select(User).where(User.id == user_id))
-                    user = result.scalar_one_or_none()
-                    if user and user.is_active:
-                        return user
-            except JWTError:
-                pass
+    """
+    Validates JWT token from Authorization header.
+    Returns the authenticated user or raises 401 Unauthorized.
+    """
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials. Please log in.",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
-    # 2. Resilient fallback to enterprise demo user so UI requests and uploads never 401
-    return await get_or_create_demo_user(db)
+    if not credentials or not credentials.credentials:
+        raise credentials_exception
+
+    token = credentials.credentials
+
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        user_id: str = payload.get("sub")
+        if not user_id:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+
+    if not user or not user.is_active:
+        raise credentials_exception
+
+    return user
+
+
+async def get_optional_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    db: AsyncSession = Depends(get_db),
+) -> Optional[User]:
+    """
+    Like get_current_user but returns None instead of raising 401.
+    Used for endpoints that work with or without auth (e.g. health checks).
+    """
+    if not credentials or not credentials.credentials:
+        return None
+    try:
+        return await get_current_user(credentials, db)
+    except HTTPException:
+        return None
