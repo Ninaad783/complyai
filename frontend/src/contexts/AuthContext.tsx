@@ -27,13 +27,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem("complyai_token");
-    const storedUser = localStorage.getItem("complyai_user");
-    if (stored && storedUser) {
-      setToken(stored);
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    const validateAuth = async () => {
+      const storedToken = localStorage.getItem("complyai_token");
+      
+      // If no token or legacy demo token, clear storage immediately so login page is shown
+      if (!storedToken || storedToken.startsWith("demo_")) {
+        localStorage.removeItem("complyai_token");
+        localStorage.removeItem("complyai_user");
+        setToken(null);
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        // Validate token against backend /api/v1/auth/me
+        const currentUser = await api.auth.me();
+        if (currentUser && currentUser.email) {
+          setUser(currentUser);
+          setToken(storedToken);
+          localStorage.setItem("complyai_user", JSON.stringify(currentUser));
+        } else {
+          throw new Error("Invalid user profile");
+        }
+      } catch (err) {
+        // Stale, invalid, or expired session -> clear storage so user is directed to login
+        localStorage.removeItem("complyai_token");
+        localStorage.removeItem("complyai_user");
+        setToken(null);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    validateAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
