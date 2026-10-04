@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Sidebar from "@/components/Sidebar";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
-  const [isDemo, setIsDemo] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -17,9 +19,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [user, isLoading, router]);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/health", { signal: AbortSignal.timeout(2000) })
-      .then((r) => setIsDemo(!r.ok))
-      .catch(() => setIsDemo(true));
+    // Check health against configured production/local API URL with 8s timeout
+    fetch(`${API_URL}/api/health`, { signal: AbortSignal.timeout(8000) })
+      .then((r) => setIsOffline(!r.ok))
+      .catch(() => setIsOffline(true));
   }, []);
 
   if (isLoading) {
@@ -37,13 +40,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0a0a0f]">
-      {isDemo && (
+      {isOffline && (
         <div className="flex items-center justify-center gap-2 bg-rose-500/10 border-b border-rose-500/20 px-4 py-2 text-xs text-rose-400 shrink-0">
           <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <span>
-            <strong>Connection Warning</strong> — Backend server at http://localhost:8000 is unreachable. Please ensure the backend is started to synchronize live data.
+            <strong>Connection Warning</strong> — Backend server at {API_URL} is unreachable. Please verify backend status and CORS configuration.
           </span>
         </div>
       )}
