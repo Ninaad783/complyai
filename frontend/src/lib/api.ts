@@ -1,4 +1,14 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const PRODUCTION_BACKEND_URL = "https://complyai-backend-77br.onrender.com";
+
+export function getApiUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+  }
+  if (typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+    return PRODUCTION_BACKEND_URL;
+  }
+  return "http://localhost:8000";
+}
 
 function getAuthHeader(): Record<string, string> {
   if (typeof window === "undefined") return {};
@@ -7,9 +17,10 @@ function getAuthHeader(): Record<string, string> {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const baseUrl = getApiUrl();
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, {
+    res = await fetch(`${baseUrl}${path}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -18,7 +29,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       },
     });
   } catch (err: any) {
-    throw new Error(`Unable to connect to ComplyAI backend server (${API_URL}). Please verify the server is running.`);
+    throw new Error(`Unable to connect to ComplyAI backend server (${baseUrl}). Please verify the server is running.`);
   }
 
   if (!res.ok) {
@@ -70,15 +81,16 @@ export const api = {
     upload: async (file: File) => {
       const form = new FormData();
       form.append("file", file);
+      const baseUrl = getApiUrl();
       let res: Response;
       try {
-        res = await fetch(`${API_URL}/api/v1/documents/upload`, {
+        res = await fetch(`${baseUrl}/api/v1/documents/upload`, {
           method: "POST",
           headers: getAuthHeader(),
           body: form,
         });
       } catch (err: any) {
-        throw new Error(`Unable to connect to ComplyAI backend at ${API_URL}`);
+        throw new Error(`Unable to connect to ComplyAI backend at ${baseUrl}`);
       }
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));

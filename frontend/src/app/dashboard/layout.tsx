@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Sidebar from "@/components/Sidebar";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { getApiUrl } from "@/lib/api";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -19,8 +18,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [user, isLoading, router]);
 
   useEffect(() => {
+    const url = getApiUrl();
     // Check health against configured production/local API URL with 8s timeout
-    fetch(`${API_URL}/api/health`, { signal: AbortSignal.timeout(8000) })
+    fetch(`${url}/api/health`, { signal: AbortSignal.timeout(8000) })
       .then((r) => setIsOffline(!r.ok))
       .catch(() => setIsOffline(true));
   }, []);
@@ -46,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <span>
-            <strong>Connection Warning</strong> — Backend server at {API_URL} is unreachable. Please verify backend status and CORS configuration.
+            <strong>Connection Warning</strong> — Backend server at {getApiUrl()} is unreachable. Please verify backend status and CORS configuration.
           </span>
         </div>
       )}
