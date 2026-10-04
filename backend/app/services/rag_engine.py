@@ -40,8 +40,11 @@ async def get_embedding(content: str, max_retries: int = 2) -> Optional[List[flo
     for attempt in range(max_retries):
         try:
             genai.configure(api_key=settings.GOOGLE_API_KEY)
+            emb_model = settings.EMBEDDING_MODEL or "models/gemini-embedding-001"
+            if emb_model == "models/embedding-001" or "gemini" not in emb_model:
+                emb_model = "models/gemini-embedding-001"
             result = genai.embed_content(
-                model=settings.EMBEDDING_MODEL,
+                model=emb_model,
                 content=content[:2048]
             )
             return result.get("embedding")
@@ -180,9 +183,21 @@ async def rag_answer(question: str, document_ids: List[str], user_id: str) -> di
 
             scored.append((score, chunk, doc_name, doc_filename))
 
-        # Sort by relevance
+        # Sort by relevance and filter out irrelevant noise
         scored.sort(key=lambda x: x[0], reverse=True)
-        top_chunks = scored[:5]
+        top_chunks = [item for item in scored[:5] if item[0] >= 0.10]
+
+        # If no chunks passed the relevance threshold, respond informatively without attaching false citations
+        if not top_chunks:
+            fallback_prompt = (
+                f"You are ComplyAI, an enterprise compliance intelligence analyst.\n"
+                f"The user asked: {question}\n\n"
+                f"Note: None of the user's uploaded documents contain relevant information for this query. "
+                f"Answer their question informatively using standard enterprise compliance best practices, "
+                f"and mention that this specific topic was not found in their currently uploaded documents."
+            )
+            answer = await generate_with_gemini(fallback_prompt)
+            return {"answer": answer, "sources": [], "intent": "rag"}
 
         # Step 3: Build context and citation list
         context_parts = []

@@ -146,7 +146,17 @@ async def ask(
 
     # Route to handler
     try:
-        if intent == "sql":
+        if intent == "general":
+            welcome_text = (
+                "Hello! I am **ComplyAI**, your enterprise compliance intelligence assistant.\n\n"
+                "I am equipped to assist your organization across three core areas:\n"
+                "- 📄 **Search Policies:** Ask detailed compliance questions about your uploaded frameworks (SOC-2, HIPAA, ISO 27001), codes of conduct, or vendor agreements.\n"
+                "- 🗄️ **Database Queries:** Interrogate internal operational databases for employee training records, department compliance stats, or active contract obligations.\n"
+                "- ⚡ **Automated Audits:** Initiate multi-agent audit workflows to analyze cross-document risks, detect policy violations, and generate executive dossiers.\n\n"
+                "You can upload your organization's policies in the **Policy Repository** tab or ask any compliance question below."
+            )
+            result_data = {"answer": welcome_text, "sources": [], "intent": "general"}
+        elif intent == "sql":
             result_data = await text_to_sql_answer(clean_message)
         elif intent == "agent":
             result_data = await run_agent_workflow(clean_message, data.document_ids or [], current_user.id)

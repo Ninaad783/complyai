@@ -83,8 +83,11 @@ async def get_embedding(content: str, max_retries: int = 2) -> Optional[List[flo
     for attempt in range(max_retries):
         try:
             genai.configure(api_key=settings.GOOGLE_API_KEY)
+            emb_model = settings.EMBEDDING_MODEL or "models/gemini-embedding-001"
+            if emb_model == "models/embedding-001" or "gemini" not in emb_model:
+                emb_model = "models/gemini-embedding-001"
             result = genai.embed_content(
-                model=settings.EMBEDDING_MODEL,
+                model=emb_model,
                 content=content[:2048]
             )
             return result.get("embedding")
