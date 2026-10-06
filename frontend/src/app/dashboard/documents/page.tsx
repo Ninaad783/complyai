@@ -24,9 +24,9 @@ const typeColors: Record<string, string> = {
 };
 
 const statusConfig: Record<string, { label: string; color: string; dot: string }> = {
-  ready: { label: "Indexed & Verified", color: "text-emerald-400", dot: "bg-emerald-400" },
-  processing: { label: "Vectorizing Content...", color: "text-amber-400", dot: "bg-amber-400 animate-pulse" },
-  failed: { label: "Indexing Failed", color: "text-rose-400", dot: "bg-rose-400" },
+  ready: { label: "Indexed & Ready", color: "text-emerald-400", dot: "bg-emerald-400" },
+  processing: { label: "Indexing content...", color: "text-amber-400", dot: "bg-amber-400 animate-pulse" },
+  failed: { label: "Indexing failed", color: "text-rose-400", dot: "bg-rose-400" },
 };
 
 function formatSize(bytes: number) {
@@ -67,10 +67,10 @@ export default function DocumentsPage() {
     setSeedNotice("");
     try {
       const res = await api.documents.seedSamplePack();
-      setSeedNotice(res.message || "Standard compliance suite loaded successfully.");
+      setSeedNotice(res.message || "Sample compliance documents loaded successfully.");
       fetchDocs();
     } catch (err: any) {
-      setError(err.message || "Failed to load compliance suite");
+      setError(err.message || "Failed to load sample policies");
     } finally {
       setSeeding(false);
     }
@@ -104,7 +104,7 @@ export default function DocumentsPage() {
 
   const deleteDoc = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm("Remove this document from active policy repository?")) return;
+    if (!confirm("Delete this document from your policy library?")) return;
     await api.documents.delete(id);
     setDocuments((prev) => prev.filter((d) => d.id !== id));
     if (selectedDoc?.id === id) setSelectedDoc(null);
@@ -114,8 +114,8 @@ export default function DocumentsPage() {
     <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Policy &amp; Regulatory Repository</h1>
-          <p className="text-gray-400 text-xs sm:text-sm mt-1">Manage governance frameworks, vendor agreements, and SOC-2 / ISO control documentation.</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Documents &amp; Policies</h1>
+          <p className="text-gray-400 text-xs sm:text-sm mt-1">Upload and manage company security policies, vendor contracts, and compliance guidelines.</p>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
           <button
@@ -130,7 +130,7 @@ export default function DocumentsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
             )}
-            <span>{seeding ? "Importing Suite..." : "Import Compliance Suite"}</span>
+            <span>{seeding ? "Loading Policies..." : "Load Sample Policies"}</span>
           </button>
           <label className="flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs sm:text-sm font-medium text-white cursor-pointer transition-colors shadow-lg shadow-indigo-600/20">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,7 +154,7 @@ export default function DocumentsPage() {
         {uploading ? (
           <div className="flex flex-col items-center gap-3">
             <div className="w-10 h-10 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-            <p className="text-gray-300 text-sm font-medium">Extracting document structure and generating semantic vector embeddings...</p>
+            <p className="text-gray-300 text-sm font-medium">Processing and indexing document...</p>
           </div>
         ) : (
           <div className="flex flex-col items-center">
@@ -163,8 +163,8 @@ export default function DocumentsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
             </div>
-            <p className="text-gray-200 font-medium text-sm">Drop compliance policies or agreements here, or browse files</p>
-            <p className="text-gray-500 text-xs mt-1">Supports PDF, DOCX, XLSX, CSV, TXT · Maximum 50MB per file</p>
+            <p className="text-gray-200 font-medium text-sm">Drop your policies or agreements here, or browse files</p>
+            <p className="text-gray-500 text-xs mt-1">Supports PDF, DOCX, XLSX, CSV, and TXT up to 50MB</p>
           </div>
         )}
       </div>
@@ -193,7 +193,7 @@ export default function DocumentsPage() {
       {/* Document List */}
       <div>
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-          Repository Assets ({documents.length})
+          Uploaded Documents ({documents.length})
         </h2>
 
         {loading ? (
@@ -209,8 +209,8 @@ export default function DocumentsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <p className="text-gray-300 font-medium">No governance documents in repository</p>
-            <p className="text-gray-500 text-xs mt-1 mb-5">Import standard regulatory suites or upload custom company policies to enable semantic retrieval and compliance audits.</p>
+            <p className="text-gray-300 font-medium">No documents uploaded yet</p>
+            <p className="text-gray-500 text-xs mt-1 mb-5">Upload your company policies or load sample documents to start searching and running compliance audits.</p>
             <button
               onClick={handleSeedPack}
               disabled={seeding}
@@ -219,7 +219,7 @@ export default function DocumentsPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              <span>Import Enterprise Compliance Suite (SOC-2, DPA, Ethics, HIPAA)</span>
+              <span>Load Sample Policies (SOC 2, DPA, Ethics, HIPAA)</span>
             </button>
           </div>
         ) : (
@@ -284,7 +284,7 @@ export default function DocumentsPage() {
                 </span>
                 <h3 className="font-semibold text-white text-sm sm:text-base truncate">{selectedDoc.name}</h3>
               </div>
-              <p className="text-xs text-gray-500 mt-1 truncate">Original filename: {selectedDoc.original_filename}</p>
+              <p className="text-xs text-gray-500 mt-1 truncate">File: {selectedDoc.original_filename}</p>
             </div>
             <button
               onClick={() => setSelectedDoc(null)}
@@ -300,12 +300,12 @@ export default function DocumentsPage() {
               <span className="text-white font-medium">{formatSize(selectedDoc.file_size)}</span>
             </div>
             <div>
-              <span className="text-gray-500 block">Pages Extracted</span>
+              <span className="text-gray-500 block">Pages</span>
               <span className="text-white font-medium">{selectedDoc.page_count ?? "N/A"}</span>
             </div>
             <div>
               <span className="text-gray-500 block">Status</span>
-              <span className="text-emerald-400 font-medium">Semantic Index Active</span>
+              <span className="text-emerald-400 font-medium">Ready for search</span>
             </div>
           </div>
 
@@ -317,13 +317,13 @@ export default function DocumentsPage() {
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
-              Query Document in Policy Assistant
+              Ask Questions About This Doc
             </button>
             <button
               onClick={() => router.push("/dashboard/reports")}
               className="bg-white/5 hover:bg-white/10 text-gray-200 text-xs font-medium py-2.5 px-4 rounded-lg transition-colors text-center"
             >
-              Generate Audit Report
+              Create Audit Report
             </button>
           </div>
         </div>

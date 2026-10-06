@@ -31,11 +31,11 @@ interface Session {
 function IntentBadge({ intent }: { intent?: string }) {
   if (!intent) return null;
   const labels: Record<string, { label: string; icon: string }> = {
-    general: { label: "General Assistance", icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
+    general: { label: "General Question", icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
     rag: { label: "Policy Search", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
     sql: { label: "Database Query", icon: "M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3" },
-    agent: { label: "Full Audit", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
-    security_blocked: { label: "Blocked by Security", icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" },
+    agent: { label: "Automated Audit", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
+    security_blocked: { label: "Blocked by Security Filter", icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" },
   };
   const item = labels[intent] || { label: intent, icon: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" };
   return (
@@ -71,25 +71,25 @@ function EvaluationBadge({ metrics }: { metrics?: any }) {
         <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>Verified Accuracy: {metrics.faithfulness ?? 95}%</span>
+        <span>Accuracy: {metrics.faithfulness ?? 95}%</span>
         <span className="text-[8px] opacity-75">▼</span>
       </button>
       {open && (
         <div className="absolute left-0 top-6 z-20 w-64 bg-[#14141e] border border-[#262638] rounded-xl p-3 shadow-2xl text-xs space-y-1.5 animate-fade-in">
           <div className="font-semibold text-white border-b border-white/10 pb-1 flex justify-between">
-            <span>Accuracy &amp; Source Check</span>
+            <span>Answer Verification</span>
             <span className="text-emerald-400">{metrics.eval_status || "Verified"}</span>
           </div>
           <div className="flex justify-between text-gray-400">
-            <span>Document Match:</span>
+            <span>Policy Match:</span>
             <span className="font-semibold text-emerald-400">{metrics.faithfulness ?? 95}%</span>
           </div>
           <div className="flex justify-between text-gray-400">
-            <span>Answer Relevancy:</span>
+            <span>Relevancy:</span>
             <span className="font-semibold text-indigo-300">{metrics.relevancy ?? 92}%</span>
           </div>
           <div className="flex justify-between text-gray-400">
-            <span>Context Precision:</span>
+            <span>Context Quality:</span>
             <span className="font-semibold text-cyan-300">{metrics.context_precision ?? 90}%</span>
           </div>
           <div className="flex justify-between text-gray-400 border-t border-white/5 pt-1">
@@ -107,12 +107,12 @@ function PiiBadge({ detected }: { detected?: string[] }) {
   return (
     <span
       className="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full px-2.5 py-0.5 text-[11px] font-medium"
-      title={`Redacted sensitive identifiers: ${detected.join(", ")}`}
+      title={`Redacted sensitive data: ${detected.join(", ")}`}
     >
       <svg className="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
       </svg>
-      <span>PII Redacted: {detected.join(", ")}</span>
+      <span>Redacted: {detected.join(", ")}</span>
     </span>
   );
 }
@@ -295,10 +295,10 @@ export default function ChatPage() {
   };
 
   const suggestedPrompts = [
-    "What are our password length and MFA hardware key requirements under SOC-2?",
-    "Which employees are overdue for mandatory compliance training?",
-    "Summarize subprocessor notification and objection windows in our Vendor DPA",
-    "Run an automated compliance check across policies and employee records",
+    "What are our password length and MFA requirements under SOC-2?",
+    "Which employees haven't finished mandatory security training?",
+    "Summarize subprocessor notification requirements in our vendor DPA",
+    "Check employee records for anyone missing compliance training",
   ];
 
   const sessionsContent = (
@@ -387,18 +387,18 @@ export default function ChatPage() {
 
             <div className="min-w-0">
               <h1 className="font-semibold text-white tracking-tight text-sm sm:text-base truncate">
-                Compliance Intelligence Assistant
+                Policy &amp; Compliance Assistant
               </h1>
               <p className="text-[11px] sm:text-xs text-gray-500 truncate hidden xs:block">
-                Search policies · Check database records · Run automated audits
+                Search policies · Query database records · Run automated checks
               </p>
             </div>
           </div>
 
           <div className="hidden sm:flex items-center gap-2 text-xs shrink-0">
             <span className="badge-rag px-2.5 py-1 rounded-full text-[11px] font-medium">Search Policies</span>
-            <span className="badge-sql px-2.5 py-1 rounded-full text-[11px] font-medium">Check Database</span>
-            <span className="badge-agent px-2.5 py-1 rounded-full text-[11px] font-medium">Full Audit</span>
+            <span className="badge-sql px-2.5 py-1 rounded-full text-[11px] font-medium">Query Database</span>
+            <span className="badge-agent px-2.5 py-1 rounded-full text-[11px] font-medium">Run Audit</span>
           </div>
         </div>
 
@@ -411,9 +411,9 @@ export default function ChatPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h2 className="text-base sm:text-lg font-semibold text-white mb-2">Ask About Policies &amp; Compliance Records</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-white mb-2">How can I help with your compliance?</h2>
               <p className="text-gray-400 text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed px-2">
-                Search through uploaded regulatory standards, verify employee records in the database, or run complete automated audits.
+                Ask anything about your company policies, verify employee records in the database, or check security requirements.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-left">
                 {suggestedPrompts.map((p) => (
@@ -470,13 +470,13 @@ export default function ChatPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                placeholder="Ask any question about your documents, policies, or database records..."
+                placeholder="Ask a question about your policies, documents, or employee records..."
                 rows={1}
                 className="w-full bg-transparent px-4 pt-3 pb-2 text-sm text-white placeholder-gray-600 resize-none focus:outline-none"
                 style={{ minHeight: "44px", maxHeight: "120px" }}
               />
               <div className="flex items-center justify-between px-4 pb-2">
-                <span className="text-xs text-gray-600">Enter to send · Shift+Enter for new line</span>
+                <span className="text-xs text-gray-600">Press Enter to send · Shift + Enter for new line</span>
               </div>
             </div>
             <button

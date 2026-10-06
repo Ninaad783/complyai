@@ -80,8 +80,8 @@ export default function ReportsPage() {
     <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Audit &amp; Regulatory Dossiers</h1>
-          <p className="text-gray-400 mt-1 text-xs sm:text-sm">Formal compliance assessments, continuous control evaluations, and gap analysis dossiers</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Audit Reports</h1>
+          <p className="text-gray-400 mt-1 text-xs sm:text-sm">Generate, review, and export formal compliance assessments and gap analysis reports.</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -90,7 +90,7 @@ export default function ReportsPage() {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Initiate Audit Dossier
+          New Audit Report
         </button>
       </div>
 
@@ -102,7 +102,7 @@ export default function ReportsPage() {
               <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Initiate Compliance Audit
+              Generate Audit Report
             </h3>
             <button
               onClick={() => setShowForm(false)}
@@ -113,23 +113,23 @@ export default function ReportsPage() {
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1.5 uppercase tracking-wider">Audit Scope &amp; Title</label>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5 uppercase tracking-wider">Report Name</label>
               <input
                 type="text"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 className="w-full bg-[#0a0a0f] border border-[#1e1e2e] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 text-sm"
-                placeholder="e.g., Annual SOC 2 Type II Gap Analysis & Access Controls"
+                placeholder="e.g., SOC 2 Access Control & Password Audit"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1.5 uppercase tracking-wider">Audit Inquiry &amp; Scope Mandate</label>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5 uppercase tracking-wider">What should this report evaluate?</label>
               <textarea
                 value={form.query}
                 onChange={(e) => setForm({ ...form, query: e.target.value })}
                 rows={3}
                 className="w-full bg-[#0a0a0f] border border-[#1e1e2e] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 text-sm resize-none"
-                placeholder="Examine cryptographic standards, user access revocation latency, and data retention adherence across indexed policies and operational databases..."
+                placeholder="e.g., Check password standards, MFA enforcement, and employee training completion across our policies and database records..."
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -138,9 +138,9 @@ export default function ReportsPage() {
                 onChange={(e) => setForm({ ...form, report_type: e.target.value })}
                 className="bg-[#0a0a0f] border border-[#1e1e2e] rounded-lg px-4 py-2.5 text-white focus:outline-none text-sm"
               >
-                <option value="compliance">Continuous Control Audit</option>
-                <option value="risk">Quantitative Risk Assessment</option>
-                <option value="summary">Executive Governance Brief</option>
+                <option value="compliance">Control &amp; Compliance Audit</option>
+                <option value="risk">Risk &amp; Gap Assessment</option>
+                <option value="summary">Executive Summary</option>
               </select>
               <button
                 onClick={generateReport}
@@ -150,9 +150,9 @@ export default function ReportsPage() {
                 {generating ? (
                   <span className="flex items-center justify-center gap-2">
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Executing Multi-Agent Audit Pipeline...
+                    Generating report...
                   </span>
-                ) : "Execute Audit Analysis"}
+                ) : "Generate Report"}
               </button>
             </div>
             {error && <div className="text-rose-400 text-sm bg-rose-500/10 border border-rose-500/20 rounded-lg p-3">{error}</div>}
@@ -172,8 +172,8 @@ export default function ReportsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-gray-300 mb-1">No Audit Reports Generated</p>
-              <p className="text-gray-500 text-xs">Initiate a formal audit dossier above to evaluate compliance controls.</p>
+              <p className="text-sm font-medium text-gray-300 mb-1">No reports generated yet</p>
+              <p className="text-gray-500 text-xs">Click &quot;New Audit Report&quot; above to run a compliance check.</p>
             </div>
           ) : (
             reports.map((r) => (
@@ -218,7 +218,7 @@ export default function ReportsPage() {
                   </button>
                   <span className="text-xs px-2.5 py-1 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-full font-medium flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    Verified Audit
+                    Completed Audit
                   </span>
                 </div>
               </div>
@@ -229,7 +229,7 @@ export default function ReportsPage() {
               </div>
               {selectedReport.content?.sources?.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-[#1e1e2e]">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Verified Evidentiary Sources</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Referenced Policies &amp; Sources</p>
                   <div className="flex flex-wrap gap-2">
                     {selectedReport.content.sources.map((s: any, i: number) => (
                       <span key={i} className="text-xs bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-lg flex items-center gap-1">
@@ -250,8 +250,8 @@ export default function ReportsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-gray-300 mb-1">Select an Audit Dossier</p>
-              <p className="text-gray-500 text-xs max-w-sm mx-auto">Choose a compliance report from the left pane to view full evaluation findings, risk score breakdown, and cited regulatory sources.</p>
+              <p className="text-sm font-medium text-gray-300 mb-1">Select an Audit Report</p>
+              <p className="text-gray-500 text-xs max-w-sm mx-auto">Choose a report on the left to view detailed findings, risk score breakdown, and referenced policy sources.</p>
             </div>
           )}
         </div>

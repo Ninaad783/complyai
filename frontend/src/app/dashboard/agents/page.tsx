@@ -14,7 +14,7 @@ const AGENT_STEPS = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    desc: "Searches uploaded policies & manuals",
+    desc: "Finds relevant policy rules",
   },
   {
     id: "sql",
@@ -24,7 +24,7 @@ const AGENT_STEPS = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3" />
       </svg>
     ),
-    desc: "Checks employee & company records",
+    desc: "Inspects employee & account records",
   },
   {
     id: "compliance",
@@ -34,34 +34,34 @@ const AGENT_STEPS = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
       </svg>
     ),
-    desc: "Finds rule violations & gaps",
+    desc: "Spots violations & missing rules",
   },
   {
     id: "risk",
-    label: "Assess Risk",
+    label: "Calculate Risk",
     icon: (
       <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
     ),
-    desc: "Calculates overall risk score",
+    desc: "Evaluates impact & risk score",
   },
   {
     id: "report",
-    label: "Final Report",
+    label: "Generate Report",
     icon: (
       <svg className="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    desc: "Creates clear summary & actions",
+    desc: "Builds summary with action items",
   },
 ];
 
 const EXAMPLE_QUERIES = [
-  "Check SOC-2 password policy requirements against our employee database records",
-  "Review vendor contracts expiring in 90 days and verify required notification windows",
-  "Audit employee compliance training records to identify who has not completed security training",
+  "Check SOC-2 password policy requirements against employee database records",
+  "Review vendor contracts expiring in 90 days and verify notice windows",
+  "Audit training records to identify employees who haven't completed security training",
 ];
 
 interface AgentStep {
@@ -83,13 +83,13 @@ export default function AgentsPage() {
     setResult(null);
     setError("");
 
-    // Step-by-step progress with clean, simple descriptions
+    // Step-by-step progress with clean, natural descriptions
     const stepLabels = [
-      "Searching uploaded policies and documentation...",
-      "Checking employee and company database records...",
-      "Verifying compliance rules and finding gaps...",
-      "Calculating risk score and severity...",
-      "Generating final audit summary report..."
+      "Searching uploaded policies & guidelines...",
+      "Checking employee & account records in database...",
+      "Verifying compliance rules and spotting gaps...",
+      "Calculating overall risk score & severity...",
+      "Generating final audit summary & action items..."
     ];
     const stepArr: AgentStep[] = stepLabels.map((label) => ({ label, done: false, active: false }));
     setSteps([...stepArr]);
@@ -182,13 +182,13 @@ export default function AgentsPage() {
 
       {/* Query Input */}
       <div className="glass rounded-xl p-4 sm:p-6">
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Audit Question &amp; Scope</h3>
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">What do you want to audit?</h3>
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           rows={3}
           className="w-full bg-[#0a0a0f] border border-[#1e1e2e] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500 resize-none mb-3"
-          placeholder="e.g., Check password policy requirements against our employee database records to find non-compliant accounts..."
+          placeholder="e.g., Check password policy requirements against employee database records to find non-compliant accounts..."
         />
         <div className="flex flex-col sm:flex-row flex-wrap gap-2 mb-4">
           {EXAMPLE_QUERIES.map((q) => (
@@ -209,7 +209,7 @@ export default function AgentsPage() {
           {running ? (
             <span className="flex items-center justify-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Running Automated Audit...
+              Running audit...
             </span>
           ) : (
             <>
@@ -217,7 +217,7 @@ export default function AgentsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Run Automated Audit</span>
+              <span>Run Audit</span>
             </>
           )}
         </button>
@@ -259,7 +259,7 @@ export default function AgentsPage() {
             <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 className="font-semibold text-white">Audit Report & Recommendations</h3>
+            <h3 className="font-semibold text-white">Audit Findings &amp; Recommendations</h3>
           </div>
           <div className="prose prose-invert max-w-none text-sm leading-relaxed text-gray-300 max-h-[500px] overflow-y-auto space-y-2">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>

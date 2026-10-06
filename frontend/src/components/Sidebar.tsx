@@ -17,7 +17,7 @@ const navItems = [
   },
   {
     href: "/dashboard/chat",
-    label: "Compliance Query",
+    label: "Ask ComplyAI",
     icon: (
       <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -26,7 +26,7 @@ const navItems = [
   },
   {
     href: "/dashboard/documents",
-    label: "Policy Repository",
+    label: "Documents",
     icon: (
       <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -81,7 +81,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
           </div>
           <div>
             <div className="font-bold text-white text-sm leading-none tracking-wide">ComplyAI</div>
-            <div className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-semibold">Enterprise GRC</div>
+            <div className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-semibold">Security &amp; Compliance</div>
           </div>
         </div>
 
@@ -129,12 +129,14 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-xs font-medium text-white truncate">{user?.full_name || "User"}</div>
-            <div className="text-[10px] text-gray-500 capitalize truncate">{user?.role || "analyst"}</div>
+            <div className="text-[10px] text-gray-500 capitalize truncate">
+              {user?.role === "analyst" ? "Security Analyst" : user?.role || "Team Member"}
+            </div>
           </div>
           <button
             onClick={handleLogout}
             className="text-gray-500 hover:text-rose-400 transition-colors p-1.5 rounded-lg hover:bg-white/5"
-            title="Sign out session"
+            title="Sign out"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -43,24 +43,24 @@ export default function LoginPage() {
           <div>
             <span className="text-xl font-bold gradient-text tracking-tight">ComplyAI</span>
             <span className="ml-2 text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full">
-              Enterprise GRC
+              Security &amp; Compliance
             </span>
           </div>
         </div>
 
         <div className="max-w-xl">
           <h2 className="text-4xl font-bold text-white leading-tight mb-4 tracking-tight">
-            Institutional GRC &amp;<br />
-            <span className="gradient-text">Regulatory Orchestration</span>
+            Automated compliance &amp;<br />
+            <span className="gradient-text">audit readiness in minutes</span>
           </h2>
           <p className="text-gray-400 text-base mb-8 leading-relaxed">
-            Enterprise infrastructure for continuous control monitoring, automated policy verification, and audit readiness across multi-framework compliance standards.
+            ComplyAI connects your security policies and operational database to automatically check controls, catch compliance gaps, and generate audit-ready reports.
           </p>
           <div className="space-y-5">
             {[
               {
-                title: "Semantic Policy Verification",
-                desc: "Real-time cross-examination across SOC 2, HIPAA, ISO 27001 & internal policy manuals",
+                title: "Instant Policy Search",
+                desc: "Get verified answers directly from your SOC 2, ISO 27001, and company policy manuals",
                 icon: (
                   <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -68,8 +68,8 @@ export default function LoginPage() {
                 ),
               },
               {
-                title: "Continuous Database Control Telemetry",
-                desc: "Automated schema inspection and real-time audit queries over operational records",
+                title: "Live Database Verification",
+                desc: "Check user accounts, password requirements, and training records against live data",
                 icon: (
                   <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3h-9C5.5 4 4 5 4 7zm0 5c0 1.5 1.5 2.5 3.5 2.5h9c2 0 3.5-1 3.5-2.5m-16-5c0 1.5 1.5 2.5 3.5 2.5h9c2 0 3.5-1 3.5-2.5" />
@@ -77,8 +77,8 @@ export default function LoginPage() {
                 ),
               },
               {
-                title: "Multi-Agent Control Orchestration",
-                desc: "Autonomous retrieval, verification, and risk synthesizers working in concert",
+                title: "Automated Audits",
+                desc: "Run 5-step automated checks that test written policies against real system records",
                 icon: (
                   <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
@@ -86,8 +86,8 @@ export default function LoginPage() {
                 ),
               },
               {
-                title: "Automated Regulatory Gap Detection",
-                desc: "Quantitative risk scoring, violation tracking, and verifiable evidentiary trails",
+                title: "Audit-Ready Reports",
+                desc: "Generate clear compliance summaries with risk scores and verified evidentiary sources",
                 icon: (
                   <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -109,7 +109,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-gray-600 text-xs">
-          © 2026 ComplyAI Technologies Inc. Enterprise Governance, Risk &amp; Compliance Platform.
+          © 2026 ComplyAI. Built for security and compliance teams.
         </p>
       </div>
 
@@ -126,12 +126,12 @@ export default function LoginPage() {
           </div>
 
           <h1 className="text-2xl font-bold text-white mb-1 tracking-tight">
-            {mode === "login" ? "Institutional Access" : "Provision Organization Account"}
+            {mode === "login" ? "Welcome back" : "Create your account"}
           </h1>
           <p className="text-gray-400 text-sm mb-8">
             {mode === "login"
-              ? "Sign in to access your enterprise compliance workspace"
-              : "Register your organization for automated GRC orchestration"}
+              ? "Sign in to your ComplyAI workspace"
+              : "Get started with automated compliance auditing"}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -144,7 +144,7 @@ export default function LoginPage() {
                   value={form.full_name}
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                   className="w-full bg-[#111118] border border-[#1e1e2e] rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors text-sm"
-                  placeholder="Jane Doe, CISO"
+                  placeholder="Alex Rivera"
                 />
               </div>
             )}
@@ -156,11 +156,11 @@ export default function LoginPage() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full bg-[#111118] border border-[#1e1e2e] rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors text-sm"
-                placeholder="compliance@enterprise.com"
+                placeholder="alex@company.com"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1.5 uppercase tracking-wider">Access Credential</label>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5 uppercase tracking-wider">Password</label>
               <input
                 type="password"
                 required
@@ -185,10 +185,10 @@ export default function LoginPage() {
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  {mode === "login" ? "Authenticating Session..." : "Provisioning Account..."}
+                  {mode === "login" ? "Signing in..." : "Creating account..."}
                 </span>
               ) : (
-                mode === "login" ? "Authenticate Session" : "Create Enterprise Account"
+                mode === "login" ? "Sign In" : "Create Account"
               )}
             </button>
           </form>
@@ -196,28 +196,28 @@ export default function LoginPage() {
           <div className="mt-6 text-center text-sm text-gray-400">
             {mode === "login" ? (
               <>
-                Need to register an enterprise account?{" "}
+                Don&apos;t have an account?{" "}
                 <button onClick={() => setMode("register")} className="text-indigo-400 hover:text-indigo-300 font-medium">
-                  Register
+                  Sign up
                 </button>
               </>
             ) : (
               <>
-                Already have an enterprise account?{" "}
+                Already have an account?{" "}
                 <button onClick={() => setMode("login")} className="text-indigo-400 hover:text-indigo-300 font-medium">
-                  Authenticate
+                  Sign in
                 </button>
               </>
             )}
           </div>
 
-          {/* Security & Authentication Notice */}
+          {/* Security Notice */}
           <div className="mt-8 p-3.5 bg-[#111118] border border-[#1e1e2e] rounded-xl text-xs text-gray-400 flex items-start gap-2.5">
             <svg className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
             <div>
-              <span className="font-semibold text-gray-300">Verified Security:</span> Access protected via JWT Bearer authorization and SHA-256 password cryptography.
+              <span className="font-semibold text-gray-300">Encrypted &amp; Secure:</span> Your credentials and compliance records are protected with industry-standard 256-bit encryption.
             </div>
           </div>
         </div>

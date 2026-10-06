@@ -51,11 +51,11 @@ function StatCard({
 
 function RiskMeter({ score }: { score: number }) {
   const color = score >= 75 ? "#ef4444" : score >= 50 ? "#f59e0b" : "#22c55e";
-  const label = score >= 75 ? "High Risk" : score >= 50 ? "Moderate" : "Low Risk";
+  const label = score >= 75 ? "High Risk" : score >= 50 ? "Moderate Risk" : "Low Risk";
   return (
     <div className="glass rounded-xl p-5 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-white tracking-tight">Composite Risk Score</h3>
+        <h3 className="font-semibold text-white tracking-tight">Overall Risk Score</h3>
         <span className="text-xs px-2.5 py-0.5 rounded-full font-medium" style={{ background: `${color}20`, color }}>{label}</span>
       </div>
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
@@ -74,7 +74,9 @@ function RiskMeter({ score }: { score: number }) {
           </div>
         </div>
         <div>
-          <p className="text-gray-400 text-xs leading-relaxed text-center sm:text-left">Continuous enterprise risk rating derived from active policy controls, contractual commitments, and employee training compliance.</p>
+          <p className="text-gray-400 text-xs leading-relaxed text-center sm:text-left">
+            Calculated from your active security policies, team training records, and open compliance issues.
+          </p>
         </div>
       </div>
     </div>
@@ -84,7 +86,7 @@ function RiskMeter({ score }: { score: number }) {
 const quickActions = [
   {
     href: "/dashboard/chat",
-    label: "Compliance Query",
+    label: "Ask ComplyAI",
     desc: "Search policies & query database records",
     icon: (
       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,8 +97,8 @@ const quickActions = [
   },
   {
     href: "/dashboard/documents",
-    label: "Policy Repository",
-    desc: "Manage SOC-2, DPA & regulatory files",
+    label: "Policy Library",
+    desc: "Upload & manage SOC 2, ISO & internal docs",
     icon: (
       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -107,7 +109,7 @@ const quickActions = [
   {
     href: "/dashboard/reports",
     label: "Audit Reports",
-    desc: "Generate compliance & gap dossiers",
+    desc: "Generate gap assessments & audit summaries",
     icon: (
       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -117,8 +119,8 @@ const quickActions = [
   },
   {
     href: "/dashboard/agents",
-    label: "Automated Audits",
-    desc: "5-step automated policy & database audit",
+    label: "Run Audit",
+    desc: "5-step automated check across policies and data",
     icon: (
       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -146,9 +148,9 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-          Enterprise Compliance Overview
+          Compliance Overview
         </h1>
-        <p className="text-gray-400 text-xs sm:text-sm mt-1">Continuous control monitoring, policy governance, and real-time risk assessment.</p>
+        <p className="text-gray-400 text-xs sm:text-sm mt-1">Monitor security controls, track compliance gaps, and run audits across your organization.</p>
       </div>
 
       {/* Stats Grid */}
@@ -160,30 +162,30 @@ export default function DashboardPage() {
         ) : (
           <>
             <StatCard
-              label="Governance Assets"
+              label="Active Documents"
               value={stats?.documents.total ?? 0}
-              sub={`${stats?.documents.ready ?? 0} indexed & verified`}
+              sub={`${stats?.documents.ready ?? 0} indexed & ready`}
               color="bg-indigo-500/15"
               icon={<svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>}
             />
             <StatCard
-              label="Security Posture Score"
+              label="Compliance Score"
               value={`${stats?.compliance_rate ?? 0}%`}
-              sub="Across regulatory controls"
+              sub="Across active controls"
               color="bg-green-500/15"
               icon={<svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
             />
             <StatCard
-              label="Compliance Gaps Flagged"
+              label="Issues Found"
               value={stats?.violations ?? 0}
-              sub="Remediation pending"
+              sub="Needs review"
               color="bg-red-500/15"
               icon={<svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
             />
             <StatCard
-              label="Audit Assessments"
+              label="Audit Reports"
               value={stats?.reports ?? 0}
-              sub={`${stats?.messages ?? 0} queries evaluated`}
+              sub={`${stats?.messages ?? 0} questions asked`}
               color="bg-cyan-500/15"
               icon={<svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>}
             />
@@ -194,7 +196,7 @@ export default function DashboardPage() {
       {/* Quick Actions + Risk Meter */}
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 glass rounded-xl p-5 sm:p-6">
-          <h3 className="font-semibold text-white tracking-tight mb-4">Operational Workflows</h3>
+          <h3 className="font-semibold text-white tracking-tight mb-4">Quick Actions</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {quickActions.map((a) => (
               <Link
@@ -226,8 +228,8 @@ export default function DashboardPage() {
         {/* Recent Activity */}
         <div className="glass rounded-xl p-5 sm:p-6">
           <h3 className="font-semibold text-white tracking-tight mb-4 flex items-center justify-between">
-            <span>Audit Trail & Event Log</span>
-            <span className="text-xs font-normal text-gray-500">Live feed</span>
+            <span>Recent Activity</span>
+            <span className="text-xs font-normal text-gray-500">Live</span>
           </h3>
           {loading ? (
             <div className="space-y-3">
@@ -237,7 +239,7 @@ export default function DashboardPage() {
             </div>
           ) : activities.length === 0 ? (
             <div className="py-8 text-center text-gray-500 text-xs leading-relaxed">
-              No compliance events logged in current session. Indexed policy activities and audit runs will populate in real time.
+              No recent activity yet. When you upload documents, ask questions, or run audits, they will appear here.
             </div>
           ) : (
             <div className="space-y-2.5">
@@ -257,12 +259,12 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Agent Flow Diagram */}
+        {/* How It Works Flow */}
         <div className="glass rounded-xl p-5 sm:p-6 flex flex-col justify-between">
           <div>
-            <h3 className="font-semibold text-white tracking-tight mb-4">Enterprise Orchestration Architecture</h3>
+            <h3 className="font-semibold text-white tracking-tight mb-4">How ComplyAI Works</h3>
             <div className="flex items-center gap-2 flex-wrap mb-4">
-              {["User Query", "Security Guard", "PII Redactor", "Intent Router", "RAG / SQL", "Risk Evaluator", "Audit Report"].map(
+              {["User Query", "Security Check", "PII Redaction", "Smart Router", "Policies & DB", "Risk Analysis", "Audit Report"].map(
                 (step, i, arr) => (
                   <div key={step} className="flex items-center gap-2 mb-2">
                     <div className="px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-xs text-indigo-300 font-medium whitespace-nowrap">
@@ -280,7 +282,7 @@ export default function DashboardPage() {
           </div>
           <div className="border-t border-white/5 pt-4">
             <p className="text-xs text-gray-400 leading-relaxed">
-              All inbound requests undergo automated adversarial prompt inspection and cryptographic PII redaction, followed by semantic routing across vector-embedded policy stores and relational databases.
+              Every query is checked for security and sensitive data (PII), then answered with verified citations from your uploaded policies and live database records.
             </p>
           </div>
         </div>
