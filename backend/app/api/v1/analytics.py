@@ -40,14 +40,18 @@ async def get_overview(
 
     if report_rows:
         scores = [r[0] for r in report_rows if r[0] is not None]
-        avg_risk = round(sum(scores) / len(scores)) if scores else 35
+        avg_risk = round(sum(scores) / len(scores)) if scores else 0
         total_violations = sum([r[1] for r in report_rows if r[1] is not None])
         compliance_rate = max(10, min(100, 100 - (avg_risk // 2)))
+    elif ready_docs > 0:
+        avg_risk = 25
+        total_violations = 0
+        compliance_rate = 95
     else:
-        # Default baseline if no reports generated yet
-        avg_risk = 28 if ready_docs > 0 else 15
-        total_violations = 1 if ready_docs > 0 else 0
-        compliance_rate = 92 if ready_docs > 0 else 98
+        # Brand new user with no reports and no documents
+        avg_risk = None
+        total_violations = 0
+        compliance_rate = None
 
     return {
         "documents": {"total": doc_count, "ready": ready_docs, "processing": doc_count - ready_docs},

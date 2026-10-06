@@ -10,8 +10,8 @@ interface Stats {
   chat_sessions: number;
   messages: number;
   reports: number;
-  risk_score: number;
-  compliance_rate: number;
+  risk_score: number | null;
+  compliance_rate: number | null;
   violations: number;
 }
 
@@ -44,12 +44,40 @@ function StatCard({
       </div>
       <div className="text-2xl font-bold text-white">{value}</div>
       <div className="text-sm text-gray-400 mt-0.5">{label}</div>
-      {sub && <div className="text-xs text-gray-600 mt-1">{sub}</div>}
+      {sub && <div className="text-xs text-gray-500 mt-1">{sub}</div>}
     </div>
   );
 }
 
-function RiskMeter({ score }: { score: number }) {
+function RiskMeter({ score }: { score?: number | null }) {
+  if (score === null || score === undefined) {
+    return (
+      <div className="glass rounded-xl p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-white tracking-tight">Overall Risk Score</h3>
+          <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-white/5 text-gray-400 border border-white/10">
+            Pending Audit
+          </span>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+          <div className="relative w-20 h-20 shrink-0">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#252538" strokeWidth="3" />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xl font-bold text-gray-500">—</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-gray-400 text-xs leading-relaxed text-center sm:text-left">
+              Upload policies or run an automated audit to assess your organization&apos;s risk score.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const color = score >= 75 ? "#ef4444" : score >= 50 ? "#f59e0b" : "#22c55e";
   const label = score >= 75 ? "High Risk" : score >= 50 ? "Moderate Risk" : "Low Risk";
   return (
@@ -143,6 +171,13 @@ export default function DashboardPage() {
     ]).finally(() => setLoading(false));
   }, []);
 
+  const hasAuditData = Boolean(
+    (stats?.reports && stats.reports > 0) ||
+    (stats?.documents?.ready && stats.documents.ready > 0)
+  );
+  const complianceRate = hasAuditData ? stats?.compliance_rate : null;
+  const riskScore = hasAuditData ? stats?.risk_score : null;
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-4 sm:space-y-6">
       {/* Header */}
@@ -170,8 +205,8 @@ export default function DashboardPage() {
             />
             <StatCard
               label="Compliance Score"
-              value={`${stats?.compliance_rate ?? 0}%`}
-              sub="Across active controls"
+              value={complianceRate != null ? `${complianceRate}%` : "—"}
+              sub={complianceRate != null ? "Across active controls" : "Upload documents to calculate"}
               color="bg-green-500/15"
               icon={<svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
             />
@@ -219,7 +254,7 @@ export default function DashboardPage() {
         {loading ? (
           <div className="glass rounded-xl h-40 skeleton" />
         ) : (
-          <RiskMeter score={stats?.risk_score ?? 0} />
+          <RiskMeter score={riskScore} />
         )}
       </div>
 
