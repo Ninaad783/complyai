@@ -66,6 +66,21 @@ export const api = {
     me: async () => {
       return request<any>("/api/v1/auth/me");
     },
+    updateProfile: async (data: { full_name: string }) => {
+      return request<any>("/api/v1/auth/profile", {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+    },
+    changePassword: async (data: { current_password: string; new_password: string }) => {
+      return request<any>("/api/v1/auth/change-password", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    team: async () => {
+      return request<any[]>("/api/v1/auth/team");
+    },
   },
 
   documents: {
@@ -74,6 +89,13 @@ export const api = {
     },
     get: async (id: string) => {
       return request<any>(`/api/v1/documents/${id}`);
+    },
+    getContent: async (id: string) => {
+      return request<any>(`/api/v1/documents/${id}/content`);
+    },
+    getDownloadUrl: (id: string) => {
+      const baseUrl = getApiUrl();
+      return `${baseUrl}/api/v1/documents/${id}/download`;
     },
     delete: async (id: string) => {
       return request<any>(`/api/v1/documents/${id}`, { method: "DELETE" });
@@ -130,6 +152,9 @@ export const api = {
     },
     activity: async () => {
       return request<any[]>("/api/v1/analytics/activity");
+    },
+    databaseTables: async () => {
+      return request<any>("/api/v1/analytics/database-tables");
     },
   },
 

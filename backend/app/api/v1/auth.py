@@ -32,6 +32,15 @@ class UserResponse(BaseModel):
     is_active: bool
 
 
+class ProfileUpdateRequest(BaseModel):
+    full_name: str
+
+
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
 @router.post("/register", response_model=TokenResponse)
 async def register(data: RegisterRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == data.email))
@@ -80,3 +89,65 @@ async def get_me(current_user: User = Depends(get_current_user)):
         role=current_user.role,
         is_active=current_user.is_active,
     )
+
+
+@router.put("/profile")
+async def update_profile(
+    data: ProfileUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if not data.full_name or len(data.full_name.strip()) < 2:
+        raise HTTPException(status_code=400, detail="Full name must be at least 2 characters")
+
+    current_user.full_name = data.full_name.strip()
+    await db.commit()
+    await db.refresh(current_user)
+
+    return {
+        "message": "Profile updated successfully",
+        "user": {
+            "id": str(current_user.id),
+            "email": current_user.email,
+            "full_name": current_user.full_name,
+            "role": current_user.role,
+        },
+    }
+
+
+@router.post("/change-password")
+async def change_password(
+    data: PasswordChangeRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if not verify_password(data.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+
+    current_user.hashed_password = get_password_hash(data.new_password)
+    await db.commit()
+
+    return {"message": "Password changed successfully"}
+
+
+@router.get("/team")
+async def get_team_members(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).order_by(User.created_at.asc()))
+    users = result.scalars().all()
+    return [
+        {
+            "id": str(u.id),
+            "email": u.email,
+            "full_name": u.full_name,
+            "role": u.role,
+            "is_current": str(u.id) == str(current_user.id),
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+        }
+        for u in users
+    ]

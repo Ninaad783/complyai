@@ -128,3 +128,31 @@ async def get_activity(
     # Sort all by timestamp descending
     activities.sort(key=lambda x: x["timestamp"], reverse=True)
     return activities[:8]
+
+
+@router.get("/database-tables")
+async def get_database_tables(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    from app.services.text_to_sql import ensure_sample_tables
+    from sqlalchemy import text
+    await ensure_sample_tables()
+
+    tables = ["employees", "contracts", "financial_data"]
+    result = {}
+    for t in tables:
+        try:
+            rows_res = await db.execute(text(f"SELECT * FROM {t} LIMIT 10"))
+            keys = list(rows_res.keys())
+            rows = [dict(zip(keys, row)) for row in rows_res.all()]
+            count_res = await db.execute(text(f"SELECT COUNT(*) FROM {t}"))
+            total = count_res.scalar() or 0
+            result[t] = {
+                "columns": keys,
+                "total_records": total,
+                "sample_rows": rows,
+            }
+        except Exception:
+            result[t] = {"columns": [], "total_records": 0, "sample_rows": []}
+    return result

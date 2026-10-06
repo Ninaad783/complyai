@@ -1,13 +1,14 @@
 import os
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, BackgroundTasks
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.core.config import settings
-from app.models.models import Document, User
+from app.models.models import Document, User, DocumentChunk
 from app.services.document_processor import process_document_background
 
 router = APIRouter()
@@ -274,6 +275,69 @@ async def get_document(
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
     return {"id": doc.id, "name": doc.name, "status": doc.status, "file_type": doc.file_type}
+
+
+@router.get("/{doc_id}/content")
+async def get_document_content(
+    doc_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Document).where(Document.id == doc_id, Document.owner_id == current_user.id)
+    )
+    doc = result.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    chunk_stmt = (
+        select(DocumentChunk)
+        .where(DocumentChunk.document_id == doc_id)
+        .order_by(DocumentChunk.chunk_index.asc())
+    )
+    chunk_rows = (await db.execute(chunk_stmt)).scalars().all()
+
+    return {
+        "id": doc.id,
+        "name": doc.name,
+        "original_filename": doc.original_filename,
+        "file_type": doc.file_type,
+        "file_size": doc.file_size,
+        "page_count": doc.page_count,
+        "status": doc.status,
+        "chunk_count": len(chunk_rows),
+        "chunks": [
+            {
+                "index": c.chunk_index,
+                "page": c.page_number,
+                "content": c.content,
+            }
+            for c in chunk_rows
+        ],
+    }
+
+
+@router.get("/{doc_id}/download")
+async def download_document_file(
+    doc_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Document).where(Document.id == doc_id, Document.owner_id == current_user.id)
+    )
+    doc = result.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    if not doc.file_path or not os.path.exists(doc.file_path):
+        raise HTTPException(status_code=404, detail="Physical document file not found on disk")
+
+    return FileResponse(
+        path=doc.file_path,
+        filename=doc.original_filename,
+        media_type="application/octet-stream",
+    )
 
 
 @router.delete("/{doc_id}")

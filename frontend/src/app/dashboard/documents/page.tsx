@@ -45,6 +45,25 @@ export default function DocumentsPage() {
   const [error, setError] = useState("");
   const [seeding, setSeeding] = useState(false);
   const [seedNotice, setSeedNotice] = useState("");
+  const [viewerDoc, setViewerDoc] = useState<{ id: string; name: string; chunks: any[]; loading: boolean } | null>(null);
+  const [viewerSearch, setViewerSearch] = useState("");
+
+  const openViewer = async (doc: Document, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setViewerDoc({ id: doc.id, name: doc.name, chunks: [], loading: true });
+    try {
+      const data = await api.documents.getContent(doc.id);
+      setViewerDoc({ id: doc.id, name: doc.name, chunks: data.chunks || [], loading: false });
+    } catch (err: any) {
+      setViewerDoc({ id: doc.id, name: doc.name, chunks: [], loading: false });
+    }
+  };
+
+  const handleDownload = (docId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const url = api.documents.getDownloadUrl(docId);
+    window.open(url, "_blank");
+  };
 
   const fetchDocs = () => {
     setLoading(true);
@@ -253,19 +272,38 @@ export default function DocumentsPage() {
                       <span>{new Date(doc.created_at).toLocaleDateString()}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <span className={`w-2 h-2 rounded-full ${st.dot}`} />
-                    <span className={`text-xs ${st.color} hidden sm:inline`}>{st.label}</span>
+                    <span className={`text-xs ${st.color} hidden sm:inline mr-1`}>{st.label}</span>
+                    <button
+                      onClick={(e) => openViewer(doc, e)}
+                      title="Read extracted text chunks"
+                      className="text-gray-400 hover:text-indigo-300 transition-colors p-1.5 rounded-lg hover:bg-white/5"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => handleDownload(doc.id, e)}
+                      title="Download document file"
+                      className="text-gray-400 hover:text-emerald-400 transition-colors p-1.5 rounded-lg hover:bg-white/5"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => deleteDoc(doc.id, e)}
+                      title="Delete document"
+                      className="text-gray-500 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-white/5"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
                   </div>
-                  <button
-                    onClick={(e) => deleteDoc(doc.id, e)}
-                    title="Delete document"
-                    className="text-gray-500 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-white/5"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
                 </div>
               );
             })}
@@ -311,20 +349,122 @@ export default function DocumentsPage() {
 
           <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-2">
             <button
+              onClick={() => openViewer(selectedDoc)}
+              className="bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 text-xs font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              View Extracted Content
+            </button>
+            <button
+              onClick={() => handleDownload(selectedDoc.id)}
+              className="bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 text-xs font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download File
+            </button>
+            <button
               onClick={() => router.push("/dashboard/chat")}
               className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
-              Ask Questions About This Doc
+              Ask Questions
             </button>
-            <button
-              onClick={() => router.push("/dashboard/reports")}
-              className="bg-white/5 hover:bg-white/10 text-gray-200 text-xs font-medium py-2.5 px-4 rounded-lg transition-colors text-center"
-            >
-              Create Audit Report
-            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Extracted Chunks Viewer Modal */}
+      {viewerDoc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="glass max-w-3xl w-full max-h-[85vh] rounded-2xl flex flex-col border border-indigo-500/30 overflow-hidden shadow-2xl">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-black/40">
+              <div className="min-w-0 pr-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                    Content Inspector
+                  </span>
+                  <h3 className="font-semibold text-white text-sm sm:text-base truncate">{viewerDoc.name}</h3>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  {viewerDoc.chunks.length} semantic chunks indexed for AI retrieval
+                </p>
+              </div>
+              <button
+                onClick={() => setViewerDoc(null)}
+                className="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Filter Search */}
+            <div className="p-3 border-b border-white/10 bg-black/20">
+              <input
+                type="text"
+                value={viewerSearch}
+                onChange={(e) => setViewerSearch(e.target.value)}
+                placeholder="Search extracted text within this document..."
+                className="w-full bg-[#12121b] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            {/* Chunks List */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+              {viewerDoc.loading ? (
+                <div className="space-y-3 py-6">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-20 skeleton rounded-lg" />
+                  ))}
+                </div>
+              ) : viewerDoc.chunks.length === 0 ? (
+                <div className="text-center py-12 text-gray-500 text-xs">
+                  No text chunks available for this document yet. It may still be indexing.
+                </div>
+              ) : (
+                viewerDoc.chunks
+                  .filter((c) => !viewerSearch || c.content.toLowerCase().includes(viewerSearch.toLowerCase()))
+                  .map((chunk, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3.5 rounded-lg bg-black/30 border border-white/5 space-y-1.5 hover:border-white/15 transition-colors"
+                    >
+                      <div className="flex items-center justify-between text-[11px] text-gray-400">
+                        <span className="font-semibold text-indigo-300">Chunk #{chunk.index + 1}</span>
+                        {chunk.page && (
+                          <span className="bg-white/5 px-2 py-0.5 rounded text-gray-400">Page {chunk.page}</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-200 leading-relaxed font-mono whitespace-pre-wrap">
+                        {chunk.content}
+                      </p>
+                    </div>
+                  ))
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-3 sm:p-4 border-t border-white/10 bg-black/40 flex justify-end gap-2">
+              <button
+                onClick={() => handleDownload(viewerDoc.id)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+              >
+                Download Original File
+              </button>
+              <button
+                onClick={() => setViewerDoc(null)}
+                className="bg-white/10 hover:bg-white/15 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
