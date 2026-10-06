@@ -151,3 +151,22 @@ async def get_team_members(
         }
         for u in users
     ]
+
+
+@router.delete("/team/{user_id}")
+async def delete_team_member(
+    user_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if str(user_id) == str(current_user.id):
+        raise HTTPException(status_code=400, detail="You cannot delete your own account")
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    user_to_delete = result.scalar_one_or_none()
+    if not user_to_delete:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    await db.delete(user_to_delete)
+    await db.commit()
+    return {"message": f"User {user_to_delete.full_name} removed successfully"}

@@ -81,6 +81,9 @@ export const api = {
     team: async () => {
       return request<any[]>("/api/v1/auth/team");
     },
+    deleteTeamMember: async (id: string) => {
+      return request<any>(`/api/v1/auth/team/${id}`, { method: "DELETE" });
+    },
   },
 
   documents: {
