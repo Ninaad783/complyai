@@ -114,7 +114,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right - Authentication Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-5 sm:p-8">
         <div className="w-full max-w-md">
           <div className="mb-8 lg:hidden flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">

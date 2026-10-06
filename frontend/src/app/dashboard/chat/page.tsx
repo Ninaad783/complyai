@@ -134,7 +134,7 @@ function ChatBubble({ msg }: { msg: Message }) {
           </svg>
         )}
       </div>
-      <div className={`max-w-[80%] ${isUser ? "items-end" : "items-start"} flex flex-col gap-1`}>
+      <div className={`max-w-[90%] sm:max-w-[80%] ${isUser ? "items-end" : "items-start"} flex flex-col gap-1`}>
         {!isUser && <IntentBadge intent={msg.intent} />}
         <div className={`rounded-2xl px-5 py-3.5 text-sm leading-relaxed ${
           isUser
@@ -207,6 +207,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [mobileSessionsOpen, setMobileSessionsOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -227,6 +228,7 @@ export default function ChatPage() {
 
   const loadSession = async (id: string) => {
     setActiveSession(id);
+    setMobileSessionsOpen(false);
     setLoadingMessages(true);
     try {
       const data = await api.chat.messages(id);
@@ -289,6 +291,7 @@ export default function ChatPage() {
   const startNewChat = () => {
     setActiveSession(null);
     setMessages([]);
+    setMobileSessionsOpen(false);
   };
 
   const suggestedPrompts = [
@@ -298,27 +301,40 @@ export default function ChatPage() {
     "Run an automated compliance check across policies and employee records",
   ];
 
-  return (
-    <div className="flex h-screen">
-      {/* Sessions Sidebar */}
-      <div className="w-56 border-r border-[#1e1e2e] bg-[#0d0d15] flex flex-col">
-        <div className="p-3 border-b border-[#1e1e2e]">
+  const sessionsContent = (
+    <div className="flex flex-col h-full bg-[#0d0d15]">
+      <div className="p-3 border-b border-[#1e1e2e] flex items-center justify-between">
+        <button
+          onClick={startNewChat}
+          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium text-white transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          New Session
+        </button>
+        {mobileSessionsOpen && (
           <button
-            onClick={startNewChat}
-            className="w-full flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium text-white transition-colors"
+            onClick={() => setMobileSessionsOpen(false)}
+            className="md:hidden ml-2 p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/5"
+            aria-label="Close sessions"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Session
+            ✕
           </button>
+        )}
+      </div>
+      <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
+        <div className="px-2 py-1 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+          Chat History
         </div>
-        <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
-          {sessions.map((s) => (
+        {sessions.length === 0 ? (
+          <div className="p-3 text-xs text-gray-500 text-center">No previous sessions</div>
+        ) : (
+          sessions.map((s) => (
             <button
               key={s.id}
               onClick={() => loadSession(s.id)}
-              className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors truncate ${
+              className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors truncate block ${
                 activeSession === s.id
                   ? "bg-indigo-500/15 text-indigo-300 font-medium"
                   : "text-gray-400 hover:bg-white/5 hover:text-white"
@@ -326,19 +342,60 @@ export default function ChatPage() {
             >
               {s.title}
             </button>
-          ))}
-        </div>
+          ))
+        )}
       </div>
+    </div>
+  );
 
-      {/* Main Chat */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-[#1e1e2e] flex items-center justify-between">
-          <div>
-            <h1 className="font-semibold text-white tracking-tight">Compliance Intelligence Assistant</h1>
-            <p className="text-xs text-gray-500">Search policies · Check database records · Run automated audits</p>
+  return (
+    <div className="flex h-[calc(100dvh-57px)] md:h-screen overflow-hidden">
+      {/* Desktop Sessions Sidebar */}
+      <aside className="hidden md:flex w-56 border-r border-[#1e1e2e] bg-[#0d0d15] flex-col shrink-0">
+        {sessionsContent}
+      </aside>
+
+      {/* Mobile Sessions Drawer */}
+      {mobileSessionsOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setMobileSessionsOpen(false)}
+          />
+          <div className="relative w-72 max-w-[80vw] h-full z-50 shadow-2xl border-r border-[#1e1e2e]">
+            {sessionsContent}
           </div>
-          <div className="flex gap-2 text-xs">
+        </div>
+      )}
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-[#1e1e2e] flex items-center justify-between shrink-0 bg-[#0a0a0f]/80 backdrop-blur-md">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {/* Mobile Sessions Button */}
+            <button
+              onClick={() => setMobileSessionsOpen(true)}
+              className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-300 shrink-0 border border-white/5"
+              title="View Sessions"
+            >
+              <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <span>Sessions</span>
+            </button>
+
+            <div className="min-w-0">
+              <h1 className="font-semibold text-white tracking-tight text-sm sm:text-base truncate">
+                Compliance Intelligence Assistant
+              </h1>
+              <p className="text-[11px] sm:text-xs text-gray-500 truncate hidden xs:block">
+                Search policies · Check database records · Run automated audits
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2 text-xs shrink-0">
             <span className="badge-rag px-2.5 py-1 rounded-full text-[11px] font-medium">Search Policies</span>
             <span className="badge-sql px-2.5 py-1 rounded-full text-[11px] font-medium">Check Database</span>
             <span className="badge-agent px-2.5 py-1 rounded-full text-[11px] font-medium">Full Audit</span>
@@ -346,19 +403,19 @@ export default function ChatPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
           {messages.length === 0 && !loadingMessages && (
-            <div className="max-w-xl mx-auto text-center pt-12">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 border border-indigo-500/30 flex items-center justify-center mx-auto mb-4 text-indigo-400">
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="max-w-xl mx-auto text-center pt-6 sm:pt-12">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 border border-indigo-500/30 flex items-center justify-center mx-auto mb-4 text-indigo-400">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h2 className="text-lg font-semibold text-white mb-2">Ask About Policies &amp; Compliance Records</h2>
-              <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+              <h2 className="text-base sm:text-lg font-semibold text-white mb-2">Ask About Policies &amp; Compliance Records</h2>
+              <p className="text-gray-400 text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed px-2">
                 Search through uploaded regulatory standards, verify employee records in the database, or run complete automated audits.
               </p>
-              <div className="grid grid-cols-2 gap-3 text-left">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-left">
                 {suggestedPrompts.map((p) => (
                   <button
                     key={p}

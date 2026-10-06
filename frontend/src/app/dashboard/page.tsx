@@ -53,12 +53,12 @@ function RiskMeter({ score }: { score: number }) {
   const color = score >= 75 ? "#ef4444" : score >= 50 ? "#f59e0b" : "#22c55e";
   const label = score >= 75 ? "High Risk" : score >= 50 ? "Moderate" : "Low Risk";
   return (
-    <div className="glass rounded-xl p-6">
+    <div className="glass rounded-xl p-5 sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-white tracking-tight">Composite Risk Score</h3>
         <span className="text-xs px-2.5 py-0.5 rounded-full font-medium" style={{ background: `${color}20`, color }}>{label}</span>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
         <div className="relative w-20 h-20 shrink-0">
           <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
             <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1e1e2e" strokeWidth="3" />
@@ -74,7 +74,7 @@ function RiskMeter({ score }: { score: number }) {
           </div>
         </div>
         <div>
-          <p className="text-gray-400 text-xs leading-relaxed">Continuous enterprise risk rating derived from active policy controls, contractual commitments, and employee training compliance.</p>
+          <p className="text-gray-400 text-xs leading-relaxed text-center sm:text-left">Continuous enterprise risk rating derived from active policy controls, contractual commitments, and employee training compliance.</p>
         </div>
       </div>
     </div>
@@ -142,17 +142,17 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">
+        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
           Enterprise Compliance Overview
         </h1>
-        <p className="text-gray-400 text-sm mt-1">Continuous control monitoring, policy governance, and real-time risk assessment.</p>
+        <p className="text-gray-400 text-xs sm:text-sm mt-1">Continuous control monitoring, policy governance, and real-time risk assessment.</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {loading ? (
           Array(4).fill(0).map((_, i) => (
             <div key={i} className="glass rounded-xl p-5 h-28 skeleton" />
@@ -193,14 +193,14 @@ export default function DashboardPage() {
 
       {/* Quick Actions + Risk Meter */}
       <div className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 glass rounded-xl p-6">
+        <div className="lg:col-span-2 glass rounded-xl p-5 sm:p-6">
           <h3 className="font-semibold text-white tracking-tight mb-4">Operational Workflows</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {quickActions.map((a) => (
               <Link
                 key={a.href}
                 href={a.href}
-                className="flex items-center gap-3 p-4 rounded-lg bg-white/3 hover:bg-white/6 border border-white/5 hover:border-white/10 transition-all group"
+                className="flex items-center gap-3 p-3.5 sm:p-4 rounded-lg bg-white/3 hover:bg-white/6 border border-white/5 hover:border-white/10 transition-all group"
               >
                 <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${a.color} flex items-center justify-center shrink-0`}>
                   {a.icon}
@@ -224,7 +224,7 @@ export default function DashboardPage() {
       {/* Activity Feed + Pipeline */}
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Recent Activity */}
-        <div className="glass rounded-xl p-6">
+        <div className="glass rounded-xl p-5 sm:p-6">
           <h3 className="font-semibold text-white tracking-tight mb-4 flex items-center justify-between">
             <span>Audit Trail & Event Log</span>
             <span className="text-xs font-normal text-gray-500">Live feed</span>
@@ -258,7 +258,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Agent Flow Diagram */}
-        <div className="glass rounded-xl p-6 flex flex-col justify-between">
+        <div className="glass rounded-xl p-5 sm:p-6 flex flex-col justify-between">
           <div>
             <h3 className="font-semibold text-white tracking-tight mb-4">Enterprise Orchestration Architecture</h3>
             <div className="flex items-center gap-2 flex-wrap mb-4">

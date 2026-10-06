@@ -113,16 +113,18 @@ export default function AgentsPage() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Automated Compliance Audit</h1>
-        <p className="text-gray-400 text-sm mt-1">A 5-step automated check across your company policies and database records.</p>
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto space-y-4 sm:space-y-6">
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Automated Compliance Audit</h1>
+        <p className="text-gray-400 text-xs sm:text-sm mt-1">A 5-step automated check across your company policies and database records.</p>
       </div>
 
       {/* Audit Steps Visualization */}
-      <div className="glass rounded-xl p-6 mb-6">
+      <div className="glass rounded-xl p-4 sm:p-6">
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Audit Steps</h3>
-        <div className="flex items-start gap-0">
+
+        {/* Desktop View: Horizontal Flow with Arrows */}
+        <div className="hidden md:flex items-start gap-0">
           {AGENT_STEPS.map((agent, i) => (
             <div key={agent.id} className="flex items-start flex-1">
               <div className="flex flex-col items-center flex-1">
@@ -152,11 +154,35 @@ export default function AgentsPage() {
             </div>
           ))}
         </div>
+
+        {/* Mobile View: Clean Responsive Cards Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 md:hidden">
+          {AGENT_STEPS.map((agent, i) => (
+            <div
+              key={agent.id}
+              className={`p-3 rounded-lg border flex flex-col items-center text-center transition-all ${
+                steps[i]?.done ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" :
+                steps[i]?.active ? "bg-indigo-500/15 border-indigo-500/40 text-indigo-300" :
+                "bg-white/3 border-white/5 text-gray-400"
+              }`}
+            >
+              <div className="mb-1.5">
+                {steps[i]?.done ? (
+                  <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : agent.icon}
+              </div>
+              <div className="text-xs font-medium text-white">{agent.label}</div>
+              <div className="text-[10px] text-gray-500 mt-0.5 leading-tight">{agent.desc}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Query Input */}
-      <div className="glass rounded-xl p-6 mb-6">
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Audit Question & Scope</h3>
+      <div className="glass rounded-xl p-4 sm:p-6">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Audit Question &amp; Scope</h3>
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -164,12 +190,12 @@ export default function AgentsPage() {
           className="w-full bg-[#0a0a0f] border border-[#1e1e2e] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500 resize-none mb-3"
           placeholder="e.g., Check password policy requirements against our employee database records to find non-compliant accounts..."
         />
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 mb-4">
           {EXAMPLE_QUERIES.map((q) => (
             <button
               key={q}
               onClick={() => setQuery(q)}
-              className="text-xs bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-300 rounded-lg px-3 py-1.5 transition-colors text-left"
+              className="text-xs bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-300 rounded-lg px-3 py-2 transition-colors text-left"
             >
               {q.slice(0, 65)}...
             </button>
@@ -199,7 +225,7 @@ export default function AgentsPage() {
 
       {/* Live Steps */}
       {steps.length > 0 && (
-        <div className="glass rounded-xl p-6 mb-6 animate-fade-in">
+        <div className="glass rounded-xl p-4 sm:p-6 animate-fade-in">
           <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Audit Progress</h3>
           <div className="space-y-2.5">
             {steps.map((step, i) => (
@@ -228,7 +254,7 @@ export default function AgentsPage() {
 
       {/* Result */}
       {result && (
-        <div className="glass rounded-xl p-6 animate-fade-in">
+        <div className="glass rounded-xl p-4 sm:p-6 animate-fade-in">
           <div className="flex items-center gap-2 mb-4">
             <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

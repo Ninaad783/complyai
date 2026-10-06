@@ -77,15 +77,15 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Audit &amp; Regulatory Dossiers</h1>
-          <p className="text-gray-400 mt-1 text-sm">Formal compliance assessments, continuous control evaluations, and gap analysis dossiers</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Audit &amp; Regulatory Dossiers</h1>
+          <p className="text-gray-400 mt-1 text-xs sm:text-sm">Formal compliance assessments, continuous control evaluations, and gap analysis dossiers</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium text-white transition-colors shadow-lg shadow-indigo-600/20"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs sm:text-sm font-medium text-white transition-colors shadow-lg shadow-indigo-600/20 w-full sm:w-auto"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -96,7 +96,7 @@ export default function ReportsPage() {
 
       {/* Generate Form */}
       {showForm && (
-        <div className="glass rounded-xl p-6 mb-6 animate-fade-in border border-indigo-500/20">
+        <div className="glass rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 animate-fade-in border border-indigo-500/20">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-white flex items-center gap-2">
               <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,7 +132,7 @@ export default function ReportsPage() {
                 placeholder="Examine cryptographic standards, user access revocation latency, and data retention adherence across indexed policies and operational databases..."
               />
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <select
                 value={form.report_type}
                 onChange={(e) => setForm({ ...form, report_type: e.target.value })}
@@ -195,18 +195,18 @@ export default function ReportsPage() {
         {/* Report Viewer */}
         <div className="lg:col-span-3">
           {selectedReport ? (
-            <div className="glass rounded-xl p-6 animate-fade-in border border-[#1e1e2e]">
-              <div className="flex items-start justify-between mb-4 pb-4 border-b border-[#1e1e2e]">
+            <div className="glass rounded-xl p-4 sm:p-6 animate-fade-in border border-[#1e1e2e]">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4 pb-4 border-b border-[#1e1e2e]">
                 <div>
                   <h3 className="font-semibold text-white text-base mb-1">{selectedReport.title}</h3>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <RiskBadge score={selectedReport.risk_score} />
                     <span className="text-xs text-gray-500">
                       Evaluated: {new Date(selectedReport.created_at).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => downloadReport(selectedReport)}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs text-gray-300 hover:text-white transition-colors"
